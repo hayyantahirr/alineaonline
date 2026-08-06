@@ -17,8 +17,8 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#f8f9fa] border-b-2 border-[#191c1d] shadow-[0_3px_0_0_#191c1d]">
-      <div className="max-w-[1180px] mx-auto px-6 h-20 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-background border-b-2 border-on-background shadow-[0_3px_0_0_var(--color-on-background)]">
+      <div className="max-w-container-max mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <img
@@ -29,7 +29,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 font-['Work_Sans'] font-semibold text-[14.5px]">
+        <nav className="hidden md:flex items-center gap-8 font-['Work_Sans'] font-semibold text-3.625">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -38,8 +38,8 @@ export default function Navbar() {
                 href={link.href}
                 className={`transition-colors py-1 ${
                   isActive
-                    ? "text-[#191c1d] border-b-2 border-[#ffd400] font-bold"
-                    : "text-[#4d4632] hover:text-[#191c1d]"
+                    ? "text-on-background border-b-2 border-primary-container font-bold"
+                    : "text-on-surface-variant hover:text-on-background"
                 }`}
               >
                 {link.name}
@@ -52,7 +52,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4">
           <Link
             href="/booking"
-            className="bg-[#ffd400] text-[#191c1d] font-['Work_Sans'] font-extrabold text-[15px] px-6 py-3 rounded-full border-[1.5px] border-[#191c1d] neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5"
+            className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-3.75 px-6 py-3 rounded-full border-1.5 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5"
           >
             Book a Session
           </Link>
@@ -61,16 +61,20 @@ export default function Navbar() {
         {/* Mobile Toggle Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg border border-[#191c1d] bg-[#edeeef] text-[#191c1d]"
+          className="md:hidden p-2 rounded-lg border border-on-background bg-surface-container text-on-background"
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
         </button>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t-2 border-[#191c1d] bg-[#f8f9fa] px-6 py-6 flex flex-col gap-4 font-['Work_Sans'] font-semibold">
+        <div className="md:hidden border-t-2 border-on-background bg-background px-6 py-6 flex flex-col gap-4 font-['Work_Sans'] font-semibold">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -80,8 +84,8 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`py-2 px-3 rounded-lg text-lg ${
                   isActive
-                    ? "bg-[#ffd400] text-[#191c1d] font-bold"
-                    : "text-[#191c1d] hover:bg-[#edeeef]"
+                    ? "bg-primary-container text-on-background font-bold"
+                    : "text-on-background hover:bg-surface-container"
                 }`}
               >
                 {link.name}
@@ -91,7 +95,7 @@ export default function Navbar() {
           <Link
             href="/booking"
             onClick={() => setMobileMenuOpen(false)}
-            className="mt-2 text-center bg-[#ffd400] text-[#191c1d] font-['Work_Sans'] font-extrabold text-[15px] px-6 py-3 rounded-full border-[1.5px] border-[#191c1d] neo-brutalist-shadow"
+            className="mt-2 text-center bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-3.75 px-6 py-3 rounded-full border-1.5 border-on-background neo-brutalist-shadow"
           >
             Book a Session
           </Link>

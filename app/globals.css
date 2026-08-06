@@ -50,8 +50,10 @@
   --color-line: #e7e8ea;
   --color-yellow-deep: #f2c400;
   --color-success: #16a34a;
+  --color-success-dark: #15803d;
   --color-outline: #7f775f;
   --color-outline-variant: #d0c6ab;
+  --color-muted: #a4a7ab;
 
   --font-eyebrow: "Work Sans", sans-serif;
   --font-display-h1: "Archivo Black", sans-serif;

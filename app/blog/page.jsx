@@ -78,32 +78,32 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="w-full bg-[#f8f9fa] text-[#191c1d]">
+    <div className="w-full bg-background text-on-background">
       {/* Header Banner */}
-      <section className="bg-[#191c1d] text-white py-16 px-6 border-b-4 border-[#ffd400]">
-        <div className="max-w-[1180px] mx-auto">
-          <span className="bg-[#ffd400] text-[#191c1d] font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+      <section className="bg-on-background text-white py-16 px-6 border-b-4 border-primary-container">
+        <div className="max-w-container-max mx-auto">
+          <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
             EXAM GUIDES & ACADEMIC INSIGHTS
           </span>
-          <h1 className="font-['Archivo_Black'] text-4xl md:text-6xl text-[#ffd400] mt-4 mb-4">
+          <h1 className="font-['Archivo_Black'] text-4xl md:text-6xl text-primary-container mt-4 mb-4">
             Blog & Exam Resources
           </h1>
-          <p className="font-['Work_Sans'] text-lg text-[#e1e3e4] max-w-2xl leading-relaxed">
+          <p className="font-['Work_Sans'] text-lg text-surface-variant max-w-2xl leading-relaxed">
             Free high-yield articles, mark scheme breakdowns, and downloadable revision guides written by senior examiners.
           </p>
         </div>
       </section>
 
       {/* Main Content Section */}
-      <section className="py-16 px-6 max-w-[1180px] mx-auto">
+      <section className="py-16 px-6 max-w-container-max mx-auto">
         {/* Featured Article */}
         {articles.filter((a) => a.featured).map((article) => (
           <div
             key={article.id}
-            className="bg-[#ffd400] text-[#191c1d] rounded-[24px] p-8 md:p-12 border-2 border-[#191c1d] neo-brutalist-shadow mb-16"
+            className="bg-primary-container text-on-background rounded-6 p-8 md:p-12 border-2 border-on-background neo-brutalist-shadow mb-16"
           >
             <div className="flex items-center gap-3 mb-4 font-['IBM_Plex_Mono'] text-xs font-bold">
-              <span className="bg-[#191c1d] text-[#ffd400] px-3 py-1 rounded-full">
+              <span className="bg-on-background text-primary-container px-3 py-1 rounded-full">
                 FEATURED ARTICLE
               </span>
               <span>{article.category}</span>
@@ -114,17 +114,17 @@ export default function BlogPage() {
             <h2 className="font-['Archivo_Black'] text-3xl md:text-5xl mb-4 leading-tight">
               {article.title}
             </h2>
-            <p className="font-['Work_Sans'] text-base md:text-lg text-[#705c00] max-w-3xl leading-relaxed mb-6">
+            <p className="font-['Work_Sans'] text-base md:text-lg text-on-primary-container max-w-3xl leading-relaxed mb-6">
               {article.excerpt}
             </p>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#191c1d]/20">
-              <div className="font-['Work_Sans'] text-xs font-bold text-[#191c1d]">
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-on-background/20">
+              <div className="font-['Work_Sans'] text-xs font-bold text-on-background">
                 By {article.author} | Published {article.date}
               </div>
               <Link
                 href="/booking"
-                className="bg-[#191c1d] text-white font-['Work_Sans'] font-bold text-sm px-6 py-3 rounded-full border border-white hover:bg-[#2e3132] transition-colors"
+                className="bg-on-background text-white font-['Work_Sans'] font-bold text-sm px-6 py-3 rounded-full border border-white hover:bg-inverse-surface transition-colors"
               >
                 Read Full Guide
               </Link>
@@ -133,7 +133,7 @@ export default function BlogPage() {
         ))}
 
         {/* Article Grid */}
-        <h3 className="font-['Archivo_Black'] text-2xl text-[#191c1d] mb-8">
+        <h3 className="font-['Archivo_Black'] text-2xl text-on-background mb-8">
           Recent Exam Guides
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
@@ -142,24 +142,24 @@ export default function BlogPage() {
             .map((art) => (
               <div
                 key={art.id}
-                className="bg-[#ffffff] rounded-[20px] p-6 border-2 border-[#191c1d] bento-shadow flex flex-col justify-between"
+                className="bg-white rounded-5 p-6 border-2 border-on-background bento-shadow flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3 font-['IBM_Plex_Mono'] text-[11px] text-[#5c5f62]">
-                    <span className="font-bold text-[#715d00]">{art.category}</span>
+                  <div className="flex items-center justify-between mb-3 font-['IBM_Plex_Mono'] text-2.75 text-secondary">
+                    <span className="font-bold text-primary">{art.category}</span>
                     <span>{art.readTime}</span>
                   </div>
-                  <h4 className="font-['Archivo_Black'] text-lg text-[#191c1d] mb-3 leading-snug">
+                  <h4 className="font-['Archivo_Black'] text-lg text-on-background mb-3 leading-snug">
                     {art.title}
                   </h4>
-                  <p className="font-['Work_Sans'] text-xs text-[#4d4632] leading-relaxed mb-4">
+                  <p className="font-['Work_Sans'] text-xs text-on-surface-variant leading-relaxed mb-4">
                     {art.excerpt}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-[#e7e8ea] flex items-center justify-between text-xs">
-                  <span className="font-['Work_Sans'] font-semibold text-[#5c5f62]">{art.author}</span>
-                  <Link href="/booking" className="font-bold text-[#715d00] hover:underline">
+                <div className="pt-3 border-t border-line flex items-center justify-between text-xs">
+                  <span className="font-['Work_Sans'] font-semibold text-secondary">{art.author}</span>
+                  <Link href="/booking" className="font-bold text-primary hover:underline">
                     Read Article →
                   </Link>
                 </div>
@@ -168,11 +168,11 @@ export default function BlogPage() {
         </div>
 
         {/* Free Resource Downloads */}
-        <div className="bg-[#191c1d] text-white rounded-[24px] p-8 md:p-12 border-2 border-[#191c1d] shadow-lg mb-16">
-          <span className="bg-[#ffd400] text-[#191c1d] font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+        <div className="bg-on-background text-white rounded-6 p-8 md:p-12 border-2 border-on-background shadow-lg mb-16">
+          <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
             FREE DOWNLOADS
           </span>
-          <h2 className="font-['Archivo_Black'] text-3xl md:text-4xl text-[#ffd400] mt-3 mb-6">
+          <h2 className="font-['Archivo_Black'] text-3xl md:text-4xl text-primary-container mt-3 mb-6">
             Revision Cheat Sheets & Model Packs
           </h2>
 
@@ -180,28 +180,28 @@ export default function BlogPage() {
             {freeResources.map((res, i) => (
               <div
                 key={i}
-                className="bg-[#2e3132] p-6 rounded-xl border border-[#7f775f] flex flex-col justify-between"
+                className="bg-inverse-surface p-6 rounded-xl border border-outline flex flex-col justify-between"
               >
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="material-symbols-outlined text-2xl text-[#ffd400]">
+                    <span className="material-symbols-outlined text-2xl text-primary-container">
                       download
                     </span>
-                    <span className="font-['IBM_Plex_Mono'] text-[10px] text-[#a4a7ab]">
+                    <span className="font-['IBM_Plex_Mono'] text-2.5 text-muted">
                       {res.format}
                     </span>
                   </div>
                   <h4 className="font-['Archivo_Black'] text-base text-white mb-2">
                     {res.title}
                   </h4>
-                  <p className="font-['Work_Sans'] text-xs text-[#d9dadb] leading-relaxed mb-4">
+                  <p className="font-['Work_Sans'] text-xs text-surface-dim leading-relaxed mb-4">
                     {res.desc}
                   </p>
                 </div>
 
                 <Link
                   href="/booking"
-                  className="w-full text-center bg-[#ffd400] text-[#705c00] font-['Work_Sans'] font-extrabold text-xs py-2.5 rounded-lg border border-white"
+                  className="w-full text-center bg-primary-container text-on-primary-container font-['Work_Sans'] font-extrabold text-xs py-2.5 rounded-lg border border-white"
                 >
                   Download Guide
                 </Link>
@@ -211,16 +211,16 @@ export default function BlogPage() {
         </div>
 
         {/* Newsletter Subscription */}
-        <div className="bg-[#edeeef] rounded-[24px] p-8 md:p-12 border-2 border-[#191c1d] text-center max-w-3xl mx-auto bento-shadow">
-          <h3 className="font-['Archivo_Black'] text-2xl text-[#191c1d] mb-3">
+        <div className="bg-surface-container rounded-6 p-8 md:p-12 border-2 border-on-background text-center max-w-3xl mx-auto bento-shadow">
+          <h3 className="font-['Archivo_Black'] text-2xl text-on-background mb-3">
             Get Examiner Tips Delivered Weekly
           </h3>
-          <p className="font-['Work_Sans'] text-sm text-[#4d4632] mb-6">
+          <p className="font-['Work_Sans'] text-sm text-on-surface-variant mb-6">
             Join 1,200+ students and parents receiving weekly mark scheme breakdowns and exam timetable strategies.
           </p>
 
           {subscribed ? (
-            <div className="bg-[#16a34a] text-white p-4 rounded-full font-['Work_Sans'] font-bold text-sm">
+            <div className="bg-success text-white p-4 rounded-full font-['Work_Sans'] font-bold text-sm">
               ✓ Subscribed! You will receive our next examiner newsletter.
             </div>
           ) : (
@@ -231,11 +231,11 @@ export default function BlogPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="flex-1 p-3.5 bg-[#ffffff] border border-[#191c1d] rounded-full text-sm font-['Work_Sans']"
+                className="flex-1 p-3.5 bg-white border border-on-background rounded-full text-sm font-['Work_Sans']"
               />
               <button
                 type="submit"
-                className="bg-[#ffd400] text-[#705c00] font-['Work_Sans'] font-extrabold text-sm px-6 py-3.5 rounded-full border border-[#191c1d] neo-brutalist-shadow whitespace-nowrap"
+                className="bg-primary-container text-on-primary-container font-['Work_Sans'] font-extrabold text-sm px-6 py-3.5 rounded-full border border-on-background neo-brutalist-shadow whitespace-nowrap"
               >
                 Subscribe
               </button>

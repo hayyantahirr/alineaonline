@@ -23,7 +23,7 @@ export default function FaqSection() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-grid-gap-lg">
         <div className="md:col-span-4">
           <span className="text-eyebrow font-eyebrow uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-4">
-            <span className="w-5 h-[2px] bg-primary-container"></span> FAQ
+            <span className="w-5 h-0.5 bg-primary-container"></span> FAQ
           </span>
           <h2 className="font-display-h2 text-display-h2 text-on-background">
             Every doubt, answered up front.
@@ -33,7 +33,7 @@ export default function FaqSection() {
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className="border border-line p-6 rounded-[20px] bento-shadow bg-surface"
+              className="border border-line p-6 rounded-5 bento-shadow bg-surface"
             >
               <p className="font-bold text-on-background mb-2">{faq.q}</p>
               <p className="text-body-sm text-on-surface-variant">{faq.a}</p>

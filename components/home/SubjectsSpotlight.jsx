@@ -37,7 +37,7 @@ export default function SubjectsSpotlight() {
       <div className="px-gutter max-w-container-max mx-auto">
         <div className="mb-12">
           <span className="text-eyebrow font-eyebrow uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-4">
-            <span className="w-5 h-[2px] bg-primary-container"></span> What We Teach
+            <span className="w-5 h-0.5 bg-primary-container"></span> What We Teach
           </span>
           <h2 className="font-display-h2 text-display-h2 text-on-background mb-4">
             Economics — our flagship. Six more subjects, taught to the same standard.
@@ -51,14 +51,14 @@ export default function SubjectsSpotlight() {
         <div className="grid grid-cols-1 gap-6 mb-8">
           <Link
             href="/subjects"
-            className="group relative aspect-[16/7] rounded-[20px] overflow-hidden border-2 border-on-background shadow-[8px_8px_0_0_#191c1d] transition-transform hover:-translate-y-1 block"
+            className="group relative aspect-16/7 rounded-5 overflow-hidden border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] transition-transform hover:-translate-y-1 block"
           >
             <img
               src="/stitch/economics.jpg"
               className="w-full h-full object-cover"
               alt="Economics Flagship Subject"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-on-background/90 via-on-background/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-t from-on-background/90 via-on-background/20 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-8">
               <span className="inline-block px-3 py-1 bg-primary-container text-on-primary-container text-eyebrow font-eyebrow uppercase rounded-full mb-4 border border-on-background">
                 Flagship Subject
@@ -89,7 +89,7 @@ export default function SubjectsSpotlight() {
                 <p className="font-bold text-sm text-on-background">
                   {sub.name}
                 </p>
-                <p className="text-[10px] text-on-surface-variant uppercase font-mono">
+                <p className="text-2.5 text-on-surface-variant uppercase font-mono">
                   {sub.level}
                 </p>
               </div>
