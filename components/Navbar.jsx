@@ -24,7 +24,7 @@ export default function Navbar() {
           <img
             src="/stitch/logo.png"
             alt="Alinea Online Logo"
-            className="h-8 md:h-10 w-auto object-contain"
+            className="h-10 md:h-15 w-auto object-contain"
           />
         </Link>
 

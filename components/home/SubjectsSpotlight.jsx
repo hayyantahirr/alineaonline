@@ -78,7 +78,7 @@ export default function SubjectsSpotlight() {
           {otherSubjects.map((sub, idx) => (
             <div
               key={idx}
-              className="bg-paper border border-line rounded-full px-6 py-3 flex items-center gap-3 bento-shadow"
+              className="bg-paper border border-line rounded-full px-4 py-3 flex items-center gap-3 bento-shadow mx-auto"
             >
               <img
                 src={sub.img}

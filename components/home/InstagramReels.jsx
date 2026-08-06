@@ -1,4 +1,5 @@
 import { Play } from "lucide-react";
+import Link from "next/link";
 
 export default function InstagramReels() {
   const reels = [
@@ -13,13 +14,23 @@ export default function InstagramReels() {
       <div className="px-6 max-w-container-max mx-auto">
         <div className="mb-12">
           <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-primary-fixed flex items-center gap-2 mb-4">
-            <span className="w-5 h-0.5 bg-primary-container"></span> On Instagram
+            <span className="w-5 h-0.5 bg-primary-container"></span> On
+            Instagram
           </span>
           <h2 className="font-['Archivo_Black'] text-3xl md:text-4xl text-white mb-4">
             See how we actually teach.
           </h2>
-          <p className="text-surface-variant font-['Work_Sans'] text-base md:text-lg">
-            Live from @alineaonline — new Reels every week.
+          <p className="text-surface-variant font-['Work_Sans'] text-base md:text-lg flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span>Live from</span>
+            <Link
+              href="https://www.instagram.com/alineaonline"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-container font-bold underline underline-offset-4 hover:text-primary-fixed decoration-primary-container hover:decoration-primary-fixed transition-colors"
+            >
+              <span>@alineaonline</span>
+            </Link>
+            <span>— new Reels every week.</span>
           </p>
         </div>
 
