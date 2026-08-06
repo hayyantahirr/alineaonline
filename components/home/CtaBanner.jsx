@@ -21,7 +21,7 @@ export default function CtaBanner() {
             Book a Free Session
           </Link>
           <a
-            href="https://wa.me/"
+            href="https://wa.me/+923322348565"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-transparent text-on-background border-2 border-on-background font-['Work_Sans'] font-extrabold text-3.75 px-8 py-4 rounded-full text-center flex items-center justify-center gap-2 hover:bg-on-background/5 transition-colors"

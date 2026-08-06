@@ -69,7 +69,7 @@ export default function Footer() {
         <div className="flex gap-6 font-['IBM_Plex_Mono']">
           <Link href="/subjects" className="hover:text-primary-container">Terms</Link>
           <Link href="/subjects" className="hover:text-primary-container">Privacy Policy</Link>
-          <Link href="/booking" className="hover:text-primary-container">Book Consultation</Link>
+         <h3>powered by </h3> <Link href="https://hayyantahirr.vercel.app" className="hover:text-primary-container">hayyantahirr</Link>
         </div>
       </div>
     </footer>
