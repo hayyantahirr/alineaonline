@@ -91,7 +91,7 @@ export default function InstagramReels() {
             return (
               <div
                 key={reel.id}
-                className="bg-black rounded-2xl overflow-hidden border border-white/10 shadow-xl h-[350px] sm:h-[370px] relative w-full group hover:border-primary-container/50 transition-all duration-300"
+                className="bg-black rounded-2xl overflow-hidden border border-white/10 shadow-xl h-87.5 sm:h-92.5 relative w-full group hover:border-primary-container/50 transition-all duration-300"
               >
                 {reel.video ? (
                   <video
@@ -106,7 +106,7 @@ export default function InstagramReels() {
                   <div className="absolute inset-0 overflow-hidden rounded-2xl">
                     <iframe
                       src={embedUrl}
-                      className="absolute -top-[62px] left-0 w-full h-[540px] border-0 bg-transparent"
+                      className="absolute -top-15.5 left-0 w-full h-135 border-0 bg-transparent"
                       allow="autoplay; encrypted-media; clipboard-write; picture-in-picture; web-share"
                       scrolling="no"
                       frameBorder="0"
