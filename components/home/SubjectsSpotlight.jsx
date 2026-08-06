@@ -5,27 +5,27 @@ export default function SubjectsSpotlight() {
     {
       name: "Mathematics",
       level: "GCSE & A-Level",
-      img: "https://picsum.photos/seed/alinea-maths/100/100",
+      img: "/stitch/maths.jpg",
     },
     {
       name: "Physics",
       level: "GCSE & A-Level",
-      img: "https://picsum.photos/seed/alinea-physics/100/100",
+      img: "/stitch/physics.jpg",
     },
     {
       name: "Biology",
       level: "GCSE & A-Level",
-      img: "https://picsum.photos/seed/alinea-biology/100/100",
+      img: "/stitch/biology.jpg",
     },
     {
       name: "English Language",
       level: "GCSE & A-Level",
-      img: "https://picsum.photos/seed/alinea-english-lang/100/100",
+      img: "/stitch/english.jpg",
     },
     {
       name: "Business Studies",
       level: "GCSE & A-Level",
-      img: "https://picsum.photos/seed/alinea-business/100/100",
+      img: "/stitch/business.jpg",
     },
   ];
 
@@ -36,17 +36,14 @@ export default function SubjectsSpotlight() {
     >
       <div className="px-gutter max-w-container-max mx-auto">
         <div className="mb-12">
-          <span className="text-eyebrow font-eyebrow uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-4 font-bold text-xs">
-            <span className="w-5 h-2px bg-primary-container"></span> What We
-            Teach
+          <span className="text-eyebrow font-eyebrow uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-4">
+            <span className="w-5 h-[2px] bg-primary-container"></span> What We Teach
           </span>
-          <h2 className="font-display-h2 text-display-h2 text-on-background mb-4 text-3xl md:text-4xl">
-            Economics — our flagship. Six more subjects, taught to the same
-            standard.
+          <h2 className="font-display-h2 text-display-h2 text-on-background mb-4">
+            Economics — our flagship. Six more subjects, taught to the same standard.
           </h2>
-          <p className="font-lead text-lead text-on-surface-variant max-w-2xl text-base md:text-lg">
-            The same academic model, and the same direct oversight, now covers
-            the subjects below.
+          <p className="font-lead text-lead text-on-surface-variant max-w-2xl">
+            The same academic model, and the same direct oversight, now covers the subjects below.
           </p>
         </div>
 
@@ -54,16 +51,16 @@ export default function SubjectsSpotlight() {
         <div className="grid grid-cols-1 gap-6 mb-8">
           <Link
             href="/subjects"
-            className="group relative aspect-16/7 rounded-[20px] overflow-hidden border-2 border-on-background shadow-[8px_8px_0_0_#191c1d] transition-transform hover:-translate-y-1 block"
+            className="group relative aspect-[16/7] rounded-[20px] overflow-hidden border-2 border-on-background shadow-[8px_8px_0_0_#191c1d] transition-transform hover:-translate-y-1 block"
           >
             <img
-              src="https://picsum.photos/seed/alinea-economics/1000/450"
+              src="/stitch/economics.jpg"
               className="w-full h-full object-cover"
               alt="Economics Flagship Subject"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-on-background/90 via-on-background/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-on-background/90 via-on-background/20 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-8">
-              <span className="inline-block px-3 py-1 bg-primary-container text-on-primary-container text-eyebrow font-eyebrow uppercase rounded-full mb-4 font-bold text-xs border border-on-background">
+              <span className="inline-block px-3 py-1 bg-primary-container text-on-primary-container text-eyebrow font-eyebrow uppercase rounded-full mb-4 border border-on-background">
                 Flagship Subject
               </span>
               <h3 className="font-display-h2 text-3xl md:text-5xl text-paper mb-2">

@@ -9,24 +9,40 @@
   --color-primary-fixed: #ffe177;
   --color-primary-fixed-dim: #ebc300;
   --color-on-primary-fixed: #231b00;
+  --color-on-primary-fixed-variant: #554500;
 
   --color-secondary: #5c5f62;
   --color-secondary-container: #e1e2e7;
   --color-on-secondary-container: #626468;
+  --color-secondary-fixed: #e1e2e7;
+  --color-secondary-fixed-dim: #c5c6cb;
 
   --color-tertiary: #4d5f7d;
   --color-tertiary-container: #c6d8fc;
   --color-on-tertiary-container: #4c5e7c;
+  --color-tertiary-fixed: #d6e3ff;
+  --color-tertiary-fixed-dim: #b5c7ea;
 
   --color-background: #f8f9fa;
   --color-on-background: #191c1d;
+
   --color-surface: #f8f9fa;
   --color-on-surface: #191c1d;
   --color-on-surface-variant: #4d4632;
-  --color-surface-container: #edeeef;
+  --color-surface-dim: #d9dadb;
+  --color-surface-bright: #f8f9fa;
+  --color-surface-tint: #715d00;
+  --color-surface-variant: #e1e3e4;
+
+  --color-surface-container-lowest: #ffffff;
   --color-surface-container-low: #f3f4f5;
+  --color-surface-container: #edeeef;
   --color-surface-container-high: #e7e8e9;
   --color-surface-container-highest: #e1e3e4;
+
+  --color-inverse-surface: #2e3132;
+  --color-inverse-on-surface: #f0f1f2;
+  --color-inverse-primary: #ebc300;
 
   --color-paper: #ffffff;
   --color-ink: #191c1d;
@@ -37,11 +53,119 @@
   --color-outline: #7f775f;
   --color-outline-variant: #d0c6ab;
 
-  --font-headline: "Archivo Black", sans-serif;
-  --font-display: "Archivo Black", sans-serif;
-  --font-body: "Work Sans", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font-eyebrow: "Work Sans", sans-serif;
+  --font-display-h1: "Archivo Black", sans-serif;
+  --font-display-h2: "Archivo Black", sans-serif;
+  --font-display-h1-mobile: "Archivo Black", sans-serif;
   --font-technical-mono: "IBM Plex Mono", monospace;
+  --font-nav-link: "Work Sans", sans-serif;
+  --font-body: "Work Sans", sans-serif;
+  --font-lead: "Work Sans", sans-serif;
+  --font-button-lg: "Work Sans", sans-serif;
+  --font-body-sm: "Work Sans", sans-serif;
+
+  --spacing-base: 8px;
+  --spacing-gutter: 24px;
+  --spacing-container-max: 1180px;
+  --spacing-grid-gap-sm: 16px;
+  --spacing-grid-gap-md: 24px;
+  --spacing-grid-gap-lg: 48px;
+  --spacing-section-v-desktop: 88px;
+  --spacing-section-v-mobile: 48px;
+}
+
+/* Specific utilities matching Stitch typography and layout */
+@utility text-display-h1 {
+  font-size: 56px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+@utility text-display-h1-mobile {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+@utility text-display-h2 {
+  font-size: 32px;
+  line-height: 1.14;
+  font-weight: 400;
+}
+
+@utility text-lead {
+  font-size: 18px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+@utility text-body {
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+@utility text-body-sm {
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+@utility text-eyebrow {
+  font-size: 12.5px;
+  line-height: 1.0;
+  font-weight: 700;
+}
+
+@utility text-nav-link {
+  font-size: 14.5px;
+  line-height: 1.0;
+  font-weight: 600;
+}
+
+@utility text-button-lg {
+  font-size: 15px;
+  line-height: 1.0;
+  font-weight: 800;
+}
+
+@utility text-technical-mono {
+  font-size: 13px;
+  line-height: 1.0;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+@utility px-gutter {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@utility py-section-v-desktop {
+  padding-top: 88px;
+  padding-bottom: 88px;
+}
+
+@utility py-section-v-mobile {
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+@utility max-w-container-max {
+  max-width: 1180px;
+}
+
+@utility gap-grid-gap-sm {
+  gap: 16px;
+}
+
+@utility gap-grid-gap-md {
+  gap: 24px;
+}
+
+@utility gap-grid-gap-lg {
+  gap: 48px;
 }
 
 @layer utilities {

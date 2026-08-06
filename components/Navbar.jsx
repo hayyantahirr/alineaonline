@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -20,12 +21,11 @@ export default function Navbar() {
       <div className="max-w-[1180px] mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-[#ffd400] border-[1.5px] border-[#191c1d] rounded-lg flex items-center justify-center font-['Archivo_Black'] text-[#191c1d] text-xl neo-brutalist-shadow">
-            A
-          </div>
-          <span className="font-['Archivo_Black'] text-xl tracking-tight text-[#191c1d]">
-            ALINEA<span className="text-[#715d00]">ONLINE</span>
-          </span>
+          <img
+            src="/stitch/logo.png"
+            alt="Alinea Online Logo"
+            className="h-8 md:h-10 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -52,7 +52,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4">
           <Link
             href="/booking"
-            className="bg-[#ffd400] text-[#705c00] font-['Work_Sans'] font-extrabold text-[15px] px-6 py-3 rounded-full border-[1.5px] border-[#191c1d] neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5"
+            className="bg-[#ffd400] text-[#191c1d] font-['Work_Sans'] font-extrabold text-[15px] px-6 py-3 rounded-full border-[1.5px] border-[#191c1d] neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5"
           >
             Book a Session
           </Link>
@@ -64,9 +64,7 @@ export default function Navbar() {
           className="md:hidden p-2 rounded-lg border border-[#191c1d] bg-[#edeeef] text-[#191c1d]"
           aria-label="Toggle menu"
         >
-          <span className="material-symbols-outlined text-2xl">
-            {mobileMenuOpen ? "close" : "menu"}
-          </span>
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
@@ -93,7 +91,7 @@ export default function Navbar() {
           <Link
             href="/booking"
             onClick={() => setMobileMenuOpen(false)}
-            className="mt-2 text-center bg-[#ffd400] text-[#705c00] font-['Work_Sans'] font-extrabold text-[15px] px-6 py-3 rounded-full border-[1.5px] border-[#191c1d] neo-brutalist-shadow"
+            className="mt-2 text-center bg-[#ffd400] text-[#191c1d] font-['Work_Sans'] font-extrabold text-[15px] px-6 py-3 rounded-full border-[1.5px] border-[#191c1d] neo-brutalist-shadow"
           >
             Book a Session
           </Link>
