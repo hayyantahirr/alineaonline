@@ -3,12 +3,10 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import {
-  Upload,
   FileText,
   Camera,
   CheckCircle2,
   Send,
-  ArrowRight,
 } from "lucide-react";
 
 export default function CareersPage() {
