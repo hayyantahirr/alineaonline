@@ -13,8 +13,8 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Subjects", href: "/subjects" },
     { name: "Blog & Resources", href: "/blog" },
-    { name: "Contact", href: "https://wa.me/+923322348565" },
-    { name: "Become a Teacher", href: "mailto:info@alineaonline.com" },
+    { name: "Contact", href: "/contact" },
+    { name: "Become a Teacher", href: "/careers" },
   ];
 
   return (
