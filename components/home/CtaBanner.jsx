@@ -18,7 +18,7 @@ export default function CtaBanner() {
             href="/booking"
             className="bg-on-background text-white font-['Work_Sans'] font-extrabold text-3.75 px-8 py-4 rounded-full text-center hover:bg-inverse-surface transition-colors neo-brutalist-shadow"
           >
-            Book a Free Session
+            Book a Session
           </Link>
           <a
             href="https://wa.me/+923322348565"

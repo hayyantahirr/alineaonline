@@ -13,7 +13,8 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Subjects", href: "/subjects" },
     { name: "Blog & Resources", href: "/blog" },
-    { name: "Book a Session", href: "/booking" },
+    { name: "Contact", href: "https://wa.me/+923322348565" },
+    { name: "Become a Teacher", href: "mailto:info@alineaonline.com" },
   ];
 
   return (
@@ -32,10 +33,13 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8 font-['Work_Sans'] font-semibold text-3.625">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
+            const isExternal = link.href.startsWith("http") || link.href.startsWith("mailto");
             return (
               <Link
                 key={link.href}
                 href={link.href}
+                target={isExternal && link.href.startsWith("http") ? "_blank" : undefined}
+                rel={isExternal && link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className={`transition-colors py-1 ${
                   isActive
                     ? "text-on-background border-b-2 border-primary-container font-bold"
@@ -47,7 +51,7 @@ export default function Navbar() {
             );
           })}
         </nav>
-
+ 
         {/* Action Button */}
         <div className="hidden md:flex items-center gap-4">
           <Link
@@ -57,7 +61,7 @@ export default function Navbar() {
             Book a Session
           </Link>
         </div>
-
+ 
         {/* Mobile Toggle Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -71,17 +75,20 @@ export default function Navbar() {
           )}
         </button>
       </div>
-
+ 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t-2 border-on-background bg-background px-6 py-6 flex flex-col gap-4 font-['Work_Sans'] font-semibold">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
+            const isExternal = link.href.startsWith("http") || link.href.startsWith("mailto");
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
+                target={isExternal && link.href.startsWith("http") ? "_blank" : undefined}
+                rel={isExternal && link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className={`py-2 px-3 rounded-lg text-lg ${
                   isActive
                     ? "bg-primary-container text-on-background font-bold"

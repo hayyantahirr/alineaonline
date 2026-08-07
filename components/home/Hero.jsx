@@ -21,7 +21,7 @@ export default function Hero() {
               href="/booking"
               className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-3.75 px-8 py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 text-center hover:-translate-y-0.5"
             >
-              Book a Conversation
+              Book a Session
             </Link>
             <Link
               href="/subjects"
