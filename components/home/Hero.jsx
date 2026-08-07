@@ -11,7 +11,23 @@ export default function Hero() {
           </span>
           <h1 className="font-['Archivo_Black'] text-4xl sm:text-5xl md:text-7xl font-black text-on-background leading-[1.08] tracking-tight">
             We don&apos;t teach the syllabus.<br />
-            We teach the <span className="marker-highlight">mark scheme.</span>
+            We teach the{" "}
+            <span className="relative inline-block text-on-background">
+              mark scheme.
+              <svg
+                className="absolute -bottom-1 left-0 w-full h-3 text-[#c0392b]"
+                viewBox="0 0 100 12"
+                fill="none"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M2 8 C 30 2, 70 10, 98 4"
+                  stroke="currentColor"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
           </h1>
           <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant max-w-xl leading-relaxed">
             A small, highly focused online academy with stringent academic oversight. Specialising in IGCSE and A-Level preparations for students across the GCC and Asia.

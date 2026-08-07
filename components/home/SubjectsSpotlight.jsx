@@ -1,99 +1,121 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 export default function SubjectsSpotlight() {
-  const otherSubjects = [
+  const subjects = [
     {
+      num: "01",
+      name: "Economics",
+      level: "IGCSE & A-Level · Edexcel & AQA",
+      flagship: true,
+      description: "Our flagship subject. Taught directly from real examiner reports and mark schemes.",
+    },
+    {
+      num: "02",
       name: "Mathematics",
-      level: "GCSE & A-Level",
-      img: "/stitch/maths.jpg",
+      level: "IGCSE, Further Maths & A-Level · Edexcel & CAIE",
+      flagship: false,
+      description: "Focus on problem-solving frameworks and step-by-step mark allocation.",
     },
     {
+      num: "03",
       name: "Physics",
-      level: "GCSE & A-Level",
-      img: "/stitch/physics.jpg",
+      level: "IGCSE & A-Level · Edexcel & CAIE",
+      flagship: false,
+      description: "Mastering practical skills, mathematical methods, and structured long answers.",
     },
     {
+      num: "04",
       name: "Biology",
-      level: "GCSE & A-Level",
-      img: "/stitch/biology.jpg",
+      level: "IGCSE & A-Level · Edexcel & AQA",
+      flagship: false,
+      description: "Precision in key terminology, diagram labelling, and data analysis questions.",
     },
     {
+      num: "05",
       name: "English Language",
-      level: "GCSE & A-Level",
-      img: "/stitch/english.jpg",
+      level: "IGCSE & A-Level · Edexcel & CAIE",
+      flagship: false,
+      description: "Analytical techniques, essay structure, and unseen text interpretation.",
     },
     {
+      num: "06",
+      name: "English Literature",
+      level: "IGCSE & A-Level · Edexcel & AQA",
+      flagship: false,
+      description: "Textual analysis, comparative essays, and examiner-focused thesis writing.",
+    },
+    {
+      num: "07",
       name: "Business Studies",
-      level: "GCSE & A-Level",
-      img: "/stitch/business.jpg",
+      level: "IGCSE & A-Level · Edexcel & CAIE",
+      flagship: false,
+      description: "Case study evaluation, financial calculations, and high-level 12-mark responses.",
     },
   ];
 
   return (
     <section
       id="subjects"
-      className="py-section-v-mobile md:py-section-v-desktop bg-surface-container/30 border-y-2 border-line"
+      className="py-20 md:py-28 bg-surface-container-low/50 border-y-2 border-line"
     >
-      <div className="px-gutter max-w-container-max mx-auto">
-        <div className="mb-12">
-          <span className="text-eyebrow font-eyebrow uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-4">
+      <div className="px-6 max-w-container-max mx-auto">
+        <div className="mb-14 max-w-2xl">
+          <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-3">
             <span className="w-5 h-0.5 bg-primary-container"></span> What We Teach
           </span>
-          <h2 className="font-display-h2 text-display-h2 text-on-background mb-4">
-            Economics — our flagship. Six more subjects, taught to the same standard.
+          <h2 className="font-['Archivo_Black'] text-3xl md:text-5xl text-on-background mb-4 leading-tight">
+            Seven subjects. One uncompromising standard.
           </h2>
-          <p className="font-lead text-lead text-on-surface-variant max-w-2xl">
-            The same academic model, and the same direct oversight, now covers the subjects below.
+          <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant leading-relaxed">
+            Every subject is taught using the same mark-scheme-first methodology and direct director oversight.
           </p>
         </div>
 
-        {/* Flagship Subject Card */}
-        <div className="grid grid-cols-1 gap-6 mb-8">
-          <Link
-            href="/subjects"
-            className="group relative aspect-16/7 rounded-5 overflow-hidden border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] transition-transform hover:-translate-y-1 block"
-          >
-            <img
-              src="/stitch/economics.jpg"
-              className="w-full h-full object-cover"
-              alt="Economics Flagship Subject"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-on-background/90 via-on-background/20 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 p-8">
-              <span className="inline-block px-3 py-1 bg-primary-container text-on-primary-container text-eyebrow font-eyebrow uppercase rounded-full mb-4 border border-on-background">
-                Flagship Subject
-              </span>
-              <h3 className="font-display-h2 text-3xl md:text-5xl text-paper mb-2">
-                Economics
-              </h3>
-              <p className="text-paper/80 font-body text-sm md:text-base">
-                GCSE &amp; A-Level · Edexcel &amp; AQA
-              </p>
-            </div>
-          </Link>
-        </div>
-
-        {/* Other Subjects Pill Grid */}
-        <div className="flex flex-wrap gap-4">
-          {otherSubjects.map((sub, idx) => (
-            <div
-              key={idx}
-              className="bg-paper border border-line rounded-full px-4 py-3 flex items-center gap-3 bento-shadow mx-auto"
+        {/* Editorial Numbered List Layout (01–07) */}
+        <div className="flex flex-col border-b border-line">
+          {subjects.map((sub) => (
+            <Link
+              key={sub.num}
+              href="/subjects"
+              className="group border-t border-line py-6 md:py-8 px-4 md:px-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all duration-200 hover:bg-white rounded-2xl hover:shadow-[4px_4px_0_0_rgba(25,28,29,0.08)]"
             >
-              <img
-                src={sub.img}
-                className="w-8 h-8 rounded-full object-cover"
-                alt={sub.name}
-              />
-              <div>
-                <p className="font-bold text-sm text-on-background">
-                  {sub.name}
-                </p>
-                <p className="text-2.5 text-on-surface-variant uppercase font-mono">
-                  {sub.level}
-                </p>
+              {/* Left side: Number + Subject Name + Tag */}
+              <div className="flex items-start md:items-center gap-6 md:gap-8 flex-1">
+                <span className="font-['IBM_Plex_Mono'] font-bold text-lg md:text-xl text-[#c0392b] group-hover:scale-110 transition-transform duration-200 shrink-0">
+                  {sub.num}
+                </span>
+
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h3 className="font-['Archivo_Black'] text-xl md:text-2xl text-on-background group-hover:text-primary transition-colors">
+                      {sub.name}
+                    </h3>
+                    {sub.flagship && (
+                      <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] font-bold text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-on-background">
+                        Flagship Subject
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-['Work_Sans'] text-xs md:text-sm text-on-surface-variant">
+                    {sub.level}
+                  </p>
+                </div>
               </div>
-            </div>
+
+              {/* Middle: Short Description */}
+              <div className="md:max-w-xs lg:max-w-md text-sm text-on-surface-variant font-['Work_Sans'] leading-relaxed hidden sm:block">
+                {sub.description}
+              </div>
+
+              {/* Right side: Arrow button */}
+              <div className="flex items-center gap-2 text-on-background font-['Work_Sans'] font-bold text-xs uppercase tracking-wider group-hover:translate-x-1 transition-transform shrink-0">
+                <span className="hidden md:inline">Explore</span>
+                <div className="w-9 h-9 rounded-full border border-on-background/20 group-hover:border-on-background group-hover:bg-primary-container flex items-center justify-center transition-colors">
+                  <ArrowUpRight className="w-4 h-4 text-on-background" />
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

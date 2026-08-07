@@ -42,8 +42,24 @@ export default function FaqSection() {
               <span className="w-5 h-0.5 bg-primary-container"></span> FAQ
             </span>
             <h2 className="font-['Archivo_Black'] text-3xl md:text-4xl text-on-background leading-tight mb-4">
-              Every doubt, <span className="marker-highlight">answered</span> up
-              front.
+              Every doubt,{" "}
+              <span className="relative inline-block text-on-background">
+                answered
+                <svg
+                  className="absolute -bottom-1 left-0 w-full h-2 text-[#c0392b]"
+                  viewBox="0 0 100 12"
+                  fill="none"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M2 8 C 25 2, 75 10, 98 4"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>{" "}
+              up front.
             </h2>
             <p className="font-['Work_Sans'] text-sm text-on-surface-variant leading-relaxed">
               No surprises. No hidden terms. Just clarity before you commit.

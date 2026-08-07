@@ -203,7 +203,23 @@ export default function ContactPage() {
               Message
             </span>
             <h2 className="font-['Archivo_Black'] text-2xl md:text-3xl text-on-background mb-2">
-              Write to us <span className="marker-highlight">directly.</span>
+              Write to us{" "}
+              <span className="relative inline-block text-on-background">
+                directly.
+                <svg
+                  className="absolute -bottom-1 left-0 w-full h-2 text-[#c0392b]"
+                  viewBox="0 0 100 12"
+                  fill="none"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M2 8 C 25 2, 75 10, 98 4"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
             </h2>
             <p className="font-['Work_Sans'] text-sm text-on-surface-variant mb-8">
               Fill in the form below and our academic coordinator will respond

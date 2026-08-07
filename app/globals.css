@@ -174,19 +174,18 @@
   .marker-highlight {
     position: relative;
     display: inline-block;
-    z-index: 1;
   }
 
-  .marker-highlight::before {
+  .marker-highlight::after {
     content: "";
     position: absolute;
-    bottom: 0.1em;
-    left: -0.1em;
-    right: -0.1em;
-    height: 0.4em;
-    background-color: var(--color-yellow-deep, #f2c400);
-    z-index: -1;
-    transform: skewX(-15deg);
+    bottom: -0.05em;
+    left: -0.05em;
+    right: -0.05em;
+    height: 3.5px;
+    background-color: #c0392b;
+    border-radius: 2px;
+    transform: rotate(-0.5deg);
   }
 
   .neo-brutalist-shadow {
