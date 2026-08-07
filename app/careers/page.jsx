@@ -2,12 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import {
-  FileText,
-  Camera,
-  CheckCircle2,
-  Send,
-} from "lucide-react";
+import { FileText, Camera, CheckCircle2, Send } from "lucide-react";
 
 export default function CareersPage() {
   const [formData, setFormData] = useState({
