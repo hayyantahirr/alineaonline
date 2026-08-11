@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function SubjectsPage() {
   const subjects = [
