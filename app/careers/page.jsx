@@ -2,7 +2,15 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { FileText, Camera, CheckCircle2, Send } from "lucide-react";
+import {
+  FileText,
+  Camera,
+  CheckCircle2,
+  Send,
+  Plus,
+  X,
+  Check,
+} from "lucide-react";
 
 export default function CareersPage() {
   const [formData, setFormData] = useState({
@@ -14,16 +22,66 @@ export default function CareersPage() {
     subject: "",
     levels: "",
     experience: "",
-    examBoards: "",
+    examBoards: [],
     availability: "",
     about: "",
   });
   const [photoFile, setPhotoFile] = useState(null);
   const [cvFile, setCvFile] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [customBoardInput, setCustomBoardInput] = useState("");
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [boardError, setBoardError] = useState("");
 
   const photoInputRef = useRef(null);
   const cvInputRef = useRef(null);
+
+  const presetBoards = [
+    "Edexcel (Pearson)",
+    "Cambridge (CAIE)",
+    "AQA",
+    "OCR",
+    "IB (International Baccalaureate)",
+    "AP (Advanced Placement)",
+  ];
+
+  const addExamBoard = (board) => {
+    if (!board || !board.trim()) return;
+    const trimmed = board.trim();
+    if (!formData.examBoards.includes(trimmed)) {
+      setFormData((prev) => ({
+        ...prev,
+        examBoards: [...prev.examBoards, trimmed],
+      }));
+      setBoardError("");
+    }
+  };
+
+  const removeExamBoard = (boardToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      examBoards: prev.examBoards.filter((b) => b !== boardToRemove),
+    }));
+  };
+
+  const handleSelectBoard = (e) => {
+    const val = e.target.value;
+    if (val === "Custom") {
+      setShowCustomInput(true);
+    } else if (val) {
+      addExamBoard(val);
+      setShowCustomInput(false);
+    }
+    e.target.value = "";
+  };
+
+  const handleAddCustomBoard = () => {
+    if (customBoardInput.trim()) {
+      addExamBoard(customBoardInput.trim());
+      setCustomBoardInput("");
+      setShowCustomInput(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,6 +89,10 @@ export default function CareersPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (formData.examBoards.length === 0) {
+      setBoardError("Please select or add at least one exam board.");
+      return;
+    }
     setIsSubmitted(true);
   };
 
@@ -99,7 +161,7 @@ export default function CareersPage() {
                     subject: "",
                     levels: "",
                     experience: "",
-                    examBoards: "",
+                    examBoards: [],
                     availability: "",
                     about: "",
                   });
@@ -447,25 +509,145 @@ export default function CareersPage() {
                       <option>10+ years</option>
                     </select>
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
-                      Exam Boards Familiar With *
+                  {/* Exam Boards Familiar With - Multi-select */}
+                  <div className="flex flex-col gap-2.5 sm:col-span-2">
+                    <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant flex items-center justify-between">
+                      <span>Exam Boards Familiar With *</span>
+                      {formData.examBoards.length > 0 && (
+                        <span className="text-[11px] font-semibold text-[#c0392b]">
+                          {formData.examBoards.length} board
+                          {formData.examBoards.length > 1 ? "s" : ""} selected
+                        </span>
+                      )}
                     </label>
-                    <select
-                      name="examBoards"
-                      value={formData.examBoards}
-                      onChange={handleChange}
-                      required
-                      className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3.5 text-on-background focus:border-on-background focus:outline-none transition-colors appearance-none cursor-pointer"
-                    >
-                      <option value="">Select exam board(s)</option>
-                      <option>Edexcel (Pearson)</option>
-                      <option>Cambridge (CAIE)</option>
-                      <option>AQA</option>
-                      <option>OCR</option>
-                      <option>IB (International Baccalaureate)</option>
-                      <option>Multiple boards</option>
-                    </select>
+
+                    {/* Selected Exam Boards Badges/Pills */}
+                    {formData.examBoards.length > 0 && (
+                      <div className="flex flex-wrap gap-2 p-3 bg-white border-2 border-line rounded-xl min-h-[50px] items-center">
+                        {formData.examBoards.map((board, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center gap-1.5 bg-[#f5f2e9] text-on-background font-['Work_Sans'] font-extrabold text-xs px-3 py-1.5 rounded-lg border border-line shadow-xs group"
+                          >
+                            <span>{board}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeExamBoard(board)}
+                              className="text-on-surface-variant hover:text-[#c0392b] p-0.5 rounded-md hover:bg-white transition-colors cursor-pointer"
+                              title={`Remove ${board}`}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Controls: Dropdown Select + Custom Input */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <select
+                          value=""
+                          onChange={handleSelectBoard}
+                          className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3.5 text-on-background focus:border-on-background focus:outline-none transition-colors cursor-pointer flex-1"
+                        >
+                          <option value="">+ Add an Exam Board...</option>
+                          {presetBoards.map((b) => (
+                            <option
+                              key={b}
+                              value={b}
+                              disabled={formData.examBoards.includes(b)}
+                            >
+                              {b}{" "}
+                              {formData.examBoards.includes(b)
+                                ? "✓ (Added)"
+                                : ""}
+                            </option>
+                          ))}
+                          <option value="Custom">
+                            + Other / Custom Board...
+                          </option>
+                        </select>
+                      </div>
+
+                      {/* Custom Board text input if requested */}
+                      {showCustomInput && (
+                        <div className="flex gap-2 items-center mt-1">
+                          <input
+                            type="text"
+                            value={customBoardInput}
+                            onChange={(e) =>
+                              setCustomBoardInput(e.target.value)
+                            }
+                            placeholder="Enter exam board name (e.g. WJEC, Scottish Highers)"
+                            className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3 text-on-background placeholder:text-muted focus:border-on-background focus:outline-none flex-1"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                handleAddCustomBoard();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddCustomBoard}
+                            className="bg-[#c0392b] text-white font-['Work_Sans'] font-bold text-xs px-4 py-3 rounded-xl hover:bg-[#a02e22] transition-colors cursor-pointer shrink-0"
+                          >
+                            Add Board
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowCustomInput(false);
+                              setCustomBoardInput("");
+                            }}
+                            className="text-on-surface-variant hover:text-on-background p-2"
+                            title="Cancel"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Quick Add Chips */}
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                        <span className="text-[11px] font-['Work_Sans'] font-bold uppercase tracking-wider text-muted mr-1">
+                          Quick add:
+                        </span>
+                        {presetBoards.map((board) => {
+                          const isAdded = formData.examBoards.includes(board);
+                          return (
+                            <button
+                              key={board}
+                              type="button"
+                              onClick={() =>
+                                isAdded
+                                  ? removeExamBoard(board)
+                                  : addExamBoard(board)
+                              }
+                              className={`font-['Work_Sans'] text-xs font-bold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                                isAdded
+                                  ? "bg-on-background text-white border-on-background shadow-xs"
+                                  : "bg-white text-on-surface-variant border-line hover:border-on-background/40 hover:bg-[#f5f2e9]"
+                              }`}
+                            >
+                              {isAdded ? (
+                                <Check className="w-3 h-3 text-emerald-400" />
+                              ) : (
+                                <Plus className="w-3 h-3 text-on-surface-variant" />
+                              )}
+                              {board}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {boardError && (
+                      <p className="font-['Work_Sans'] text-xs text-[#c0392b] font-bold mt-1">
+                        {boardError}
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1.5 sm:col-span-2">
                     <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
