@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Send, Clock, MapPin, Mail } from "lucide-react";
+import { CheckCircle2, Send, Clock, MapPin, Mail, Loader2 } from "lucide-react";
+import { db } from "@/config/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -14,14 +16,41 @@ export default function ContactPage() {
     message: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    setIsLoading(true);
+    setErrorMessage("");
+
+    try {
+      console.log("Submitting contact form to Firestore database...", formData);
+      const docRef = await addDoc(collection(db, "contact_messages"), {
+        parentName: formData.parentName,
+        studentName: formData.studentName,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+        createdAt: serverTimestamp(),
+        status: "unread",
+      });
+      console.log("Contact message saved successfully with Document ID:", docRef.id);
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error("Firestore submission error:", err);
+      const detail = err.code ? `[${err.code}] ${err.message}` : err.message;
+      setErrorMessage(
+        `Firebase Error: ${detail || "Could not save message to Firestore."}`
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const socialChannels = [
@@ -329,13 +358,29 @@ export default function ContactPage() {
                 />
               </div>
 
+              {errorMessage && (
+                <p className="font-['Work_Sans'] text-sm text-[#c0392b] font-bold bg-[#c0392b]/10 p-3.5 rounded-xl border border-[#c0392b]/30">
+                  {errorMessage}
+                </p>
+              )}
+
               {/* Submit */}
               <button
                 type="submit"
-                className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-sm px-8 py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 w-max"
+                disabled={isLoading}
+                className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-sm px-8 py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 w-max disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Send className="w-4 h-4" />
-                Send Message
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending Message...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Send Message
+                  </>
+                )}
               </button>
             </form>
           </div>
