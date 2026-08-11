@@ -10,7 +10,7 @@ export default function Footer() {
           <div className="md:col-span-5 flex flex-col gap-5">
             <Link href="/" className="flex items-center gap-3 group w-max">
               <img
-                src="/stitch/logo.png"
+                src="/logo.png"
                 alt="Alinea Online Logo"
                 className="h-12 md:h-14 w-auto object-contain brightness-0 invert"
               />

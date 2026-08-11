@@ -11,6 +11,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
+    { name: "Our Faculty", href: "/faculty" },
     { name: "Subjects", href: "/subjects" },
     { name: "Blog & Resources", href: "/blog" },
     { name: "Contact", href: "/contact" },
@@ -23,7 +24,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <img
-            src="/stitch/logo.png"
+            src="/logo.png"
             alt="Alinea Online Logo"
             className="h-10 md:h-15 w-auto object-contain"
           />
