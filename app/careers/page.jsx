@@ -10,7 +10,10 @@ import {
   Plus,
   X,
   Check,
+  Loader2,
 } from "lucide-react";
+import { db } from "@/config/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function CareersPage() {
   const [formData, setFormData] = useState({
@@ -32,6 +35,8 @@ export default function CareersPage() {
   const [customBoardInput, setCustomBoardInput] = useState("");
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [boardError, setBoardError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const photoInputRef = useRef(null);
   const cvInputRef = useRef(null);
@@ -87,13 +92,81 @@ export default function CareersPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const uploadFileToCloudinary = async (file, folder) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("folder", folder);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: data,
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.error || `Failed to upload ${file.name}`);
+    }
+
+    const json = await res.json();
+    return json.url;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.examBoards.length === 0) {
       setBoardError("Please select or add at least one exam board.");
       return;
     }
-    setIsSubmitted(true);
+
+    if (!cvFile) {
+      setSubmitError("Please upload your CV / Resume before submitting.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      let photoUrl = "";
+      let cvUrl = "";
+
+      if (photoFile) {
+        photoUrl = await uploadFileToCloudinary(photoFile, "careers_photos");
+      }
+
+      if (cvFile) {
+        cvUrl = await uploadFileToCloudinary(cvFile, "careers_cvs");
+      }
+
+      const docRef = await addDoc(collection(db, "career_applications"), {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        city: formData.city,
+        subject: formData.subject,
+        levels: formData.levels,
+        experience: formData.experience,
+        examBoards: formData.examBoards,
+        availability: formData.availability,
+        about: formData.about,
+        photoUrl: photoUrl,
+        cvUrl: cvUrl,
+        createdAt: serverTimestamp(),
+        status: "unread",
+      });
+
+      console.log("Career application saved to Firestore with ID:", docRef.id);
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error("Career application submission error:", err);
+      const detail = err.code ? `[${err.code}] ${err.message}` : err.message;
+      setSubmitError(
+        `Submission failed: ${detail || "Could not submit application."}`,
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePhotoChange = (e) => {
@@ -768,16 +841,32 @@ export default function CareersPage() {
                 </div>
               </div>
 
-              {/* Submit */}
-              <div className="pt-4">
+              {/* Submit & Error display */}
+              <div className="pt-4 flex flex-col gap-3">
+                {submitError && (
+                  <p className="font-['Work_Sans'] text-sm text-[#c0392b] font-bold bg-[#c0392b]/10 p-3.5 rounded-xl border border-[#c0392b]/30">
+                    {submitError}
+                  </p>
+                )}
+
                 <button
                   type="submit"
-                  className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-sm px-10 py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2.5"
+                  disabled={isSubmitting}
+                  className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-sm px-10 py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed w-max"
                 >
-                  <Send className="w-4 h-4" />
-                  Submit Application
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Submitting Application...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Submit Application
+                    </>
+                  )}
                 </button>
-                <p className="font-['Work_Sans'] text-xs text-muted mt-4">
+                <p className="font-['Work_Sans'] text-xs text-muted mt-2">
                   By submitting, you agree to Alinea&apos;s recruitment terms.
                   We&apos;ll only use your data for the hiring process.
                 </p>
