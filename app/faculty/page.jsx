@@ -22,7 +22,7 @@ export default function FacultyPage() {
     {
       name: "Dr. Sarah Lin",
       role: "Senior Mathematics Specialist",
-      image: "/stitch/maths.jpg",
+      image: "/faculty/teacher-1.jpg",
       subject: "Mathematics & Further Maths",
       levels: "IGCSE, A-Level & IB HL",
       boards: ["Edexcel", "CAIE"],
@@ -33,7 +33,7 @@ export default function FacultyPage() {
     {
       name: "James Vance",
       role: "Physics Lead",
-      image: "/stitch/physics.jpg",
+      image: "/faculty/teacher-2.jpg",
       subject: "Physics",
       levels: "IGCSE & A-Level",
       boards: ["Edexcel", "CAIE"],
@@ -44,7 +44,7 @@ export default function FacultyPage() {
     {
       name: "Dr. Rachel Mehta",
       role: "Biology Lead",
-      image: "/stitch/biology.jpg",
+      image: "/faculty/teacher-3.jpg",
       subject: "Biology",
       levels: "IGCSE & A-Level",
       boards: ["Edexcel", "AQA"],
@@ -55,7 +55,7 @@ export default function FacultyPage() {
     {
       name: "Claire Hemsworth",
       role: "English Language & Literature Lead",
-      image: "/stitch/english.jpg",
+      image: "/faculty/teacher-4.jpg",
       subject: "English Language & Literature",
       levels: "IGCSE & A-Level",
       boards: ["Edexcel", "CAIE", "AQA"],
@@ -66,7 +66,7 @@ export default function FacultyPage() {
     {
       name: "Elena Rostova",
       role: "Business Studies & Accounting Lead",
-      image: "/stitch/business.jpg",
+      image: "/faculty/teacher-5.jpg",
       subject: "Business Studies & Accounting",
       levels: "IGCSE & A-Level",
       boards: ["Edexcel", "CAIE"],
@@ -76,119 +76,102 @@ export default function FacultyPage() {
     },
   ];
 
-  
-
   return (
     <div className="w-full bg-[#faf8f2] text-on-background min-h-screen grain-bg">
-      
       {/* Academic Director — Featured Section */}
-      <section className="py-16 md:py-24 px-6 max-w-container-max mx-auto">
-        <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-3">
+      <section className="py-10 md:py-14 px-6 max-w-container-max mx-auto">
+        <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-2">
           <span className="w-5 h-0.5 bg-[#c0392b]"></span> Academic Director
         </span>
-        <h2 className="font-['Archivo_Black'] text-2xl md:text-3xl text-on-background mb-10">
+        <h2 className="font-['Archivo_Black'] text-xl md:text-2xl text-on-background mb-6">
           The standard every lesson answers to.
         </h2>
 
-        <div className="bg-white/90 rounded-2xl border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12">
+        <div className="bg-white/90 rounded-2xl border-2 border-on-background shadow-[6px_6px_0_0_var(--color-on-background)] overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
             {/* Director Photo */}
-            <div className="lg:col-span-5 relative">
-              <div className="aspect-[4/5] lg:aspect-auto lg:h-full">
-                <img
-                  src={director.image}
-                  alt={`${director.name}, ${director.role}`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-on-background/50 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-white/20"></div>
-              </div>
+            <div className="lg:col-span-4 relative h-64 lg:h-full min-h-[260px]">
+              <img
+                src={director.image}
+                alt={`${director.name}, ${director.role}`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-on-background/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-white/20"></div>
               {/* Floating Badge */}
-              <div className="absolute top-4 left-4 bg-[#c0392b] text-white font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider border border-white/20">
+              <div className="absolute top-3 left-3 bg-[#c0392b] text-white font-['IBM_Plex_Mono'] text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider border border-white/20">
                 Founder
               </div>
             </div>
 
             {/* Director Info */}
-            <div className="lg:col-span-7 p-6 md:p-10 flex flex-col justify-center gap-5">
+            <div className="lg:col-span-8 p-5 md:p-7 flex flex-col justify-center gap-3.5">
               <div>
-                <h3 className="font-['Archivo_Black'] text-3xl md:text-4xl text-on-background mb-1">
+                <h3 className="font-['Archivo_Black'] text-2xl md:text-3xl text-on-background mb-0.5">
                   {director.name}
                 </h3>
-                <p className="font-['IBM_Plex_Mono'] text-sm text-[#c0392b] font-bold">
+                <p className="font-['IBM_Plex_Mono'] text-xs text-[#c0392b] font-bold">
                   {director.role}
                 </p>
               </div>
 
-              <p className="font-['Work_Sans'] text-base text-on-surface-variant leading-relaxed">
+              <p className="font-['Work_Sans'] text-sm text-on-surface-variant leading-relaxed">
                 {director.bio}
               </p>
 
               {/* Director Details Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 py-4 border-y border-line">
+              <div className="grid grid-cols-3 gap-3 py-3 border-y border-line">
                 <div>
-                  <span className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider text-on-surface-variant block mb-1">
+                  <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
                     Subject
                   </span>
-                  <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
+                  <span className="font-['Work_Sans'] font-bold text-xs text-on-background">
                     {director.subject}
                   </span>
                 </div>
                 <div>
-                  <span className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider text-on-surface-variant block mb-1">
+                  <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
                     Levels
                   </span>
-                  <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
+                  <span className="font-['Work_Sans'] font-bold text-xs text-on-background">
                     {director.levels}
                   </span>
                 </div>
                 <div>
-                  <span className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider text-on-surface-variant block mb-1">
+                  <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
                     Experience
                   </span>
-                  <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
+                  <span className="font-['Work_Sans'] font-bold text-xs text-on-background">
                     {director.experience}
                   </span>
                 </div>
               </div>
 
-              {/* Exam Boards */}
-              <div>
-                <span className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider text-on-surface-variant block mb-2">
-                  Exam Boards
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {director.boards.map((board) => (
-                    <span
-                      key={board}
-                      className="font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1.5 rounded-lg border-2 border-[#c0392b] text-[#c0392b] bg-[#c0392b]/5"
-                    >
-                      {board}
-                    </span>
-                  ))}
+              {/* Exam Boards & CTA Row */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant">
+                    Boards:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {director.boards.map((board) => (
+                      <span
+                        key={board}
+                        className="font-['IBM_Plex_Mono'] text-[11px] font-bold px-2.5 py-1 rounded-md border border-[#c0392b] text-[#c0392b] bg-[#c0392b]/5"
+                      >
+                        {board}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+
+                <Link
+                  href="/booking"
+                  className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs px-6 py-2.5 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 inline-flex items-center gap-2"
+                >
+                  Book Session with Khawar
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
-
-              {/* Highlights */}
-              <ul className="flex flex-col gap-2.5">
-                {director.highlights.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5">
-                    <span className="text-[#c0392b] font-bold text-sm leading-none mt-1">
-                      ✓
-                    </span>
-                    <span className="font-['Work_Sans'] text-sm text-on-background">
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/booking"
-                className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-sm px-8 py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 inline-flex items-center gap-2.5 w-max mt-2"
-              >
-                Book a Session with Khawar
-                <ArrowRight className="w-4 h-4" />
-              </Link>
             </div>
           </div>
         </div>
