@@ -15,6 +15,7 @@ export default function Navbar() {
     { name: "Subjects", href: "/subjects" },
     { name: "Blog & Resources", href: "/blog" },
     { name: "Contact", href: "/contact" },
+    { name: "Pricing", href: "/pricing" },
     { name: "Become a Teacher", href: "/careers" },
   ];
 
