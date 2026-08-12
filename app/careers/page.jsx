@@ -152,6 +152,7 @@ export default function CareersPage() {
         about: formData.about,
         photoUrl: photoUrl,
         cvUrl: cvUrl,
+        cvType: cvFile ? cvFile.name.split('.').pop().toLowerCase() : "",
         createdAt: serverTimestamp(),
         status: "unread",
       });
@@ -174,7 +175,19 @@ export default function CareersPage() {
   };
 
   const handleCvChange = (e) => {
-    if (e.target.files?.[0]) setCvFile(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const allowedExts = ['pdf', 'doc', 'docx'];
+      
+      if (allowedExts.includes(ext)) {
+        setCvFile(file);
+        setSubmitError("");
+      } else {
+        setCvFile(null);
+        setSubmitError("Invalid file type. Please upload your CV as a .pdf, .doc, or .docx file.");
+      }
+    }
   };
 
   const requirements = [
