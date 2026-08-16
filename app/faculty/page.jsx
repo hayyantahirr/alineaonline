@@ -90,7 +90,7 @@ export default function FacultyPage() {
                 key={teacher.id}
                 className="bg-white rounded-2xl border-2 border-line hover:border-on-background hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-on-background)] transition-transform duration-200 flex flex-col justify-between overflow-hidden group"
               >
-                <div>
+                <div onClick={() => setSelectedTeacher(teacher)} className="cursor-pointer">
                   {/* Card Header: Photo + Core Info */}
                   <div className="p-5 md:p-6 pb-4">
                     <div className="flex items-start gap-4">
@@ -441,9 +441,9 @@ export default function FacultyPage() {
           />
 
           {/* Modal Dialog Card */}
-          <div className="relative z-10 bg-white rounded-3xl border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] max-w-2xl w-full max-h-[90vh] overflow-y-auto flex flex-col">
+          <div className="relative z-10 bg-white rounded-3xl border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="p-6 md:p-8 pb-5 border-b border-line flex items-start justify-between gap-4 sticky top-0 bg-white/95 backdrop-blur-xs z-10">
+            <div className="p-6 md:p-8 pb-5 border-b border-line flex items-start justify-between gap-4 bg-white shrink-0">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 border-line shrink-0 relative">
                   <Image
@@ -500,7 +500,7 @@ export default function FacultyPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 md:p-8 space-y-6">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-line/80 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-on-surface-variant/40 scrollbar-thin">
               {/* Bio Paragraph */}
               <div>
                 <h4 className="font-['Archivo_Black'] text-xs uppercase tracking-wider text-on-surface-variant mb-2">
@@ -583,7 +583,7 @@ export default function FacultyPage() {
             </div>
 
             {/* Modal Footer CTA */}
-            <div className="p-6 md:p-8 pt-4 border-t border-line bg-[#fbf9f4] flex flex-col sm:flex-row items-center justify-between gap-3 sticky bottom-0">
+            <div className="p-6 md:p-8 pt-4 border-t border-line bg-[#fbf9f4] flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
               <span className="font-['Work_Sans'] text-xs text-on-surface-variant">
                 1:1 &amp; Small Group Consultation Available
               </span>
