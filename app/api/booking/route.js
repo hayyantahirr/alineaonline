@@ -93,8 +93,7 @@ export async function POST(request) {
       teacherRole: sanitize(teacherRole) || "Subject Specialist",
       sessionFormat: sanitize(sessionFormat) || "1:1 Intensive Mentorship",
       timeSlot: sanitize(timeSlot) || "Flexible Timing",
-      targetGrade: sanitize(targetGrade) || "A*",
-      additionalNotes: sanitize(additionalNotes) || "",
+
       status: "pending",
       createdAt: serverTimestamp(),
     };
