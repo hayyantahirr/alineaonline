@@ -11,9 +11,12 @@ import {
   X,
   Check,
   Loader2,
+  ArrowDown,
+  Sparkles,
 } from "lucide-react";
 import { db } from "@/config/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import TeacherRubricVisual from "@/components/careers/TeacherRubricVisual";
 
 export default function CareersPage() {
   const [formData, setFormData] = useState({
@@ -42,13 +45,27 @@ export default function CareersPage() {
   const cvInputRef = useRef(null);
 
   const presetBoards = [
-    "Edexcel (Pearson)",
     "Cambridge (CAIE)",
+    "Edexcel (Pearson)",
     "AQA",
     "OCR",
     "IB (International Baccalaureate)",
     "AP (Advanced Placement)",
+    "WJEC / Eduqas",
   ];
+
+  const toggleExamBoard = (board) => {
+    if (!board || !board.trim()) return;
+    const trimmed = board.trim();
+    setFormData((prev) => {
+      const exists = prev.examBoards.includes(trimmed);
+      const next = exists
+        ? prev.examBoards.filter((b) => b !== trimmed)
+        : [...prev.examBoards, trimmed];
+      return { ...prev, examBoards: next };
+    });
+    if (boardError) setBoardError("");
+  };
 
   const addExamBoard = (board) => {
     if (!board || !board.trim()) return;
@@ -67,17 +84,6 @@ export default function CareersPage() {
       ...prev,
       examBoards: prev.examBoards.filter((b) => b !== boardToRemove),
     }));
-  };
-
-  const handleSelectBoard = (e) => {
-    const val = e.target.value;
-    if (val === "Custom") {
-      setShowCustomInput(true);
-    } else if (val) {
-      addExamBoard(val);
-      setShowCustomInput(false);
-    }
-    e.target.value = "";
   };
 
   const handleAddCustomBoard = () => {
@@ -273,41 +279,104 @@ export default function CareersPage() {
 
   return (
     <div className="w-full bg-[#faf8f2] text-on-background min-h-screen grain-bg">
-      {/* Page Header */}
-      <section className="py-16 md:py-24 px-6 border-b-2 border-line bg-[#f5f2e9]/60">
+      {/* Page Header / Hero Section */}
+      <section className="py-10 md:py-16 px-6 border-b-2 border-line bg-[#f5f2e9]/70 relative overflow-hidden">
         <div className="max-w-container-max mx-auto">
-          <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-4">
-            <span className="w-5 h-0.5 bg-[#c0392b]"></span> Join Our Team
-          </span>
-          <h1 className="font-['Archivo_Black'] text-4xl sm:text-5xl md:text-6xl text-on-background mb-4 leading-tight">
-            Teach with{" "}
-            <span className="relative inline-block text-on-background">
-              Alinea
-              <svg
-                className="absolute -bottom-1 left-0 w-full h-3 text-[#c0392b]"
-                viewBox="0 0 100 12"
-                fill="none"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d="M2 8 C 30 2, 70 10, 98 4"
-                  stroke="currentColor"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                />
-              </svg>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Column: Copy & Actions */}
+            <div className="lg:col-span-7 flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2">
+                  <span className="w-5 h-0.5 bg-[#c0392b]"></span> Join Our Faculty
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success/10 border border-success/30 font-['IBM_Plex_Mono'] text-[10px] font-bold text-success-dark">
+                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
+                  Hiring Active
+                </span>
+              </div>
+
+              <h1 className="font-['Archivo_Black'] text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-on-background leading-[1.1] tracking-tight">
+                Teach with{" "}
+                <span className="relative inline-block text-on-background">
+                  Alinea
+                  <svg
+                    className="absolute -bottom-1 left-0 w-full h-3 text-[#c0392b]"
+                    viewBox="0 0 100 12"
+                    fill="none"
+                    preserveAspectRatio="none"
+                  >
+                    <path
+                      d="M2 8 C 30 2, 70 10, 98 4"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+              </h1>
+
+              <p className="font-['Work_Sans'] text-sm sm:text-base md:text-lg text-on-surface-variant max-w-xl leading-relaxed">
+                We&apos;re looking for experienced, exam-board-literate teachers who
+                care about grade outcomes — not just lesson delivery. If you know
+                the mark scheme inside out, we want to hear from you.
+              </p>
+
+              {/* Quick Perks Pill Strip */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className="inline-flex items-center gap-1 font-['IBM_Plex_Mono'] text-xs font-semibold px-3 py-1 bg-white/80 rounded-lg border border-line text-on-background">
+                  ✓ Above-Market Pay
+                </span>
+                <span className="inline-flex items-center gap-1 font-['IBM_Plex_Mono'] text-xs font-semibold px-3 py-1 bg-white/80 rounded-lg border border-line text-on-background">
+                  ✓ 1:1 &amp; Small Groups
+                </span>
+                <span className="inline-flex items-center gap-1 font-['IBM_Plex_Mono'] text-xs font-semibold px-3 py-1 bg-white/80 rounded-lg border border-line text-on-background">
+                  ✓ Flexible Remote Hours
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <a
+                  href="#apply"
+                  className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-sm px-7 py-3.5 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 inline-flex items-center gap-2"
+                >
+                  <span>Apply Now</span>
+                  <ArrowDown className="w-4 h-4" />
+                </a>
+                <a
+                  href="#requirements"
+                  className="bg-white/80 hover:bg-white text-on-background font-['Work_Sans'] font-extrabold text-sm px-6 py-3.5 rounded-full border-2 border-on-background transition-colors duration-200"
+                >
+                  View Requirements
+                </a>
+              </div>
+            </div>
+
+            {/* Right Column: Notebook / Rubric Visual */}
+            <div className="lg:col-span-5 relative mt-4 lg:mt-0">
+              <TeacherRubricVisual />
+            </div>
+          </div>
+
+          {/* Bottom subtle scroll cue */}
+          <div className="mt-8 pt-4 border-t border-line/60 flex items-center justify-between font-['IBM_Plex_Mono'] text-[11px] text-on-surface-variant">
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#c0392b]" />
+              <span>Applications reviewed within 3–5 working days</span>
             </span>
-          </h1>
-          <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant max-w-2xl leading-relaxed">
-            We&apos;re looking for experienced, exam-board-literate teachers who
-            care about grade outcomes — not just lesson delivery. If you know
-            the mark scheme inside out, we want to hear from you.
-          </p>
+            <a
+              href="#requirements"
+              className="inline-flex items-center gap-1 hover:text-on-background transition-colors font-bold group"
+            >
+              <span>Scroll to explore</span>
+              <span className="group-hover:translate-y-0.5 transition-transform">↓</span>
+            </a>
+          </div>
         </div>
       </section>
 
       {/* Why Teach With Us + Requirements */}
-      <section className="py-16 md:py-20 px-6 max-w-container-max mx-auto">
+      <section id="requirements" className="py-14 md:py-20 px-6 max-w-container-max mx-auto scroll-mt-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
           {/* What We Offer */}
           <div>
@@ -424,7 +493,7 @@ export default function CareersPage() {
         </div>
 
         {/* Application Form */}
-        <div className="border-t-2 border-line pt-16">
+        <div id="apply" className="border-t-2 border-line pt-16 scroll-mt-10">
           <div className="max-w-3xl mx-auto">
             <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-3">
               <span className="w-5 h-0.5 bg-[#c0392b]"></span> Apply Now
@@ -595,91 +664,111 @@ export default function CareersPage() {
                       <option>10+ years</option>
                     </select>
                   </div>
-                  {/* Exam Boards Familiar With - Multi-select */}
+                  {/* Boards You Teach - True Multi-select Tags/Checkboxes */}
                   <div className="flex flex-col gap-2.5 sm:col-span-2">
-                    <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant flex items-center justify-between">
-                      <span>Exam Boards Familiar With *</span>
-                      {formData.examBoards.length > 0 && (
-                        <span className="text-[11px] font-semibold text-[#c0392b]">
+                    <div className="flex items-center justify-between">
+                      <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
+                        Boards You Teach *
+                      </label>
+                      {formData.examBoards.length > 0 ? (
+                        <span className="text-[11px] font-semibold text-[#c0392b] bg-[#c0392b]/10 px-2 py-0.5 rounded-md">
                           {formData.examBoards.length} board
                           {formData.examBoards.length > 1 ? "s" : ""} selected
                         </span>
+                      ) : (
+                        <span className="text-[11px] text-muted font-medium">
+                          Select all that apply
+                        </span>
                       )}
-                    </label>
+                    </div>
 
-                    {/* Selected Exam Boards Badges/Pills */}
-                    {formData.examBoards.length > 0 && (
-                      <div className="flex flex-wrap gap-2 p-3 bg-white border-2 border-line rounded-xl min-h-[50px] items-center">
-                        {formData.examBoards.map((board, idx) => (
-                          <span
-                            key={idx}
-                            className="inline-flex items-center gap-1.5 bg-[#f5f2e9] text-on-background font-['Work_Sans'] font-extrabold text-xs px-3 py-1.5 rounded-lg border border-line shadow-xs group"
+                    {/* True Multi-select Interactive Tags/Checkboxes Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                      {presetBoards.map((board) => {
+                        const isSelected = formData.examBoards.includes(board);
+                        return (
+                          <button
+                            key={board}
+                            type="button"
+                            onClick={() => toggleExamBoard(board)}
+                            className={`flex items-center gap-2.5 p-3 rounded-xl border-2 text-left font-['Work_Sans'] text-xs font-bold transition-all cursor-pointer select-none ${
+                              isSelected
+                                ? "bg-on-background text-white border-on-background shadow-[3px_3px_0_0_rgba(25,28,29,0.3)]"
+                                : "bg-white text-on-background border-line hover:border-on-background/50 hover:bg-[#faf8f2]"
+                            }`}
                           >
-                            <span>{board}</span>
-                            <button
-                              type="button"
-                              onClick={() => removeExamBoard(board)}
-                              className="text-on-surface-variant hover:text-[#c0392b] p-0.5 rounded-md hover:bg-white transition-colors cursor-pointer"
-                              title={`Remove ${board}`}
+                            <div
+                              className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                                isSelected
+                                  ? "bg-[#c0392b] border-[#c0392b] text-white"
+                                  : "border-muted bg-white"
+                              }`}
                             >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </span>
-                        ))}
+                              {isSelected && (
+                                <Check className="w-3 h-3 stroke-3" />
+                              )}
+                            </div>
+                            <span className="truncate">{board}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom Board / Other Added Tags */}
+                    {formData.examBoards.some(
+                      (b) => !presetBoards.includes(b),
+                    ) && (
+                      <div className="flex flex-wrap gap-2 pt-1 items-center">
+                        <span className="text-[11px] font-['Work_Sans'] font-bold uppercase tracking-wider text-muted mr-1">
+                          Other Added:
+                        </span>
+                        {formData.examBoards
+                          .filter((b) => !presetBoards.includes(b))
+                          .map((customBoard) => (
+                            <span
+                              key={customBoard}
+                              className="inline-flex items-center gap-1.5 bg-on-background text-white font-['Work_Sans'] font-bold text-xs px-3 py-1.5 rounded-lg border-2 border-on-background shadow-xs"
+                            >
+                              <span>{customBoard}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeExamBoard(customBoard)}
+                                className="text-white/70 hover:text-white p-0.5 rounded-md transition-colors cursor-pointer"
+                                title={`Remove ${customBoard}`}
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </span>
+                          ))}
                       </div>
                     )}
 
-                    {/* Controls: Dropdown Select + Custom Input */}
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <select
-                          value=""
-                          onChange={handleSelectBoard}
-                          className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3.5 text-on-background focus:border-on-background focus:outline-none transition-colors cursor-pointer flex-1"
-                        >
-                          <option value="">+ Add an Exam Board...</option>
-                          {presetBoards.map((b) => (
-                            <option
-                              key={b}
-                              value={b}
-                              disabled={formData.examBoards.includes(b)}
-                            >
-                              {b}{" "}
-                              {formData.examBoards.includes(b)
-                                ? "✓ (Added)"
-                                : ""}
-                            </option>
-                          ))}
-                          <option value="Custom">
-                            + Other / Custom Board...
-                          </option>
-                        </select>
-                      </div>
-
-                      {/* Custom Board text input if requested */}
-                      {showCustomInput && (
-                        <div className="flex gap-2 items-center mt-1">
+                    {/* Other / Custom Board Input Toggle */}
+                    <div className="pt-1">
+                      {showCustomInput ? (
+                        <div className="flex gap-2 items-center">
                           <input
                             type="text"
                             value={customBoardInput}
                             onChange={(e) =>
                               setCustomBoardInput(e.target.value)
                             }
-                            placeholder="Enter exam board name (e.g. WJEC, Scottish Highers)"
-                            className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3 text-on-background placeholder:text-muted focus:border-on-background focus:outline-none flex-1"
+                            placeholder="Enter exam board (e.g. Scottish Highers, CBSE, SAT)"
+                            className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-2.5 text-on-background placeholder:text-muted focus:border-on-background focus:outline-none flex-1"
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
                                 e.preventDefault();
                                 handleAddCustomBoard();
                               }
                             }}
+                            autoFocus
                           />
                           <button
                             type="button"
                             onClick={handleAddCustomBoard}
-                            className="bg-[#c0392b] text-white font-['Work_Sans'] font-bold text-xs px-4 py-3 rounded-xl hover:bg-[#a02e22] transition-colors cursor-pointer shrink-0"
+                            className="bg-[#c0392b] text-white font-['Work_Sans'] font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-[#a02e22] transition-colors cursor-pointer shrink-0"
                           >
-                            Add Board
+                            Add
                           </button>
                           <button
                             type="button"
@@ -693,40 +782,16 @@ export default function CareersPage() {
                             <X className="w-4 h-4" />
                           </button>
                         </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setShowCustomInput(true)}
+                          className="inline-flex items-center gap-1.5 font-['Work_Sans'] font-bold text-xs text-on-surface-variant hover:text-on-background border border-dashed border-muted hover:border-on-background px-3 py-2 rounded-xl transition-colors cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>+ Add Other / Custom Board</span>
+                        </button>
                       )}
-
-                      {/* Quick Add Chips */}
-                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                        <span className="text-[11px] font-['Work_Sans'] font-bold uppercase tracking-wider text-muted mr-1">
-                          Quick add:
-                        </span>
-                        {presetBoards.map((board) => {
-                          const isAdded = formData.examBoards.includes(board);
-                          return (
-                            <button
-                              key={board}
-                              type="button"
-                              onClick={() =>
-                                isAdded
-                                  ? removeExamBoard(board)
-                                  : addExamBoard(board)
-                              }
-                              className={`font-['Work_Sans'] text-xs font-bold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
-                                isAdded
-                                  ? "bg-on-background text-white border-on-background shadow-xs"
-                                  : "bg-white text-on-surface-variant border-line hover:border-on-background/40 hover:bg-[#f5f2e9]"
-                              }`}
-                            >
-                              {isAdded ? (
-                                <Check className="w-3 h-3 text-emerald-400" />
-                              ) : (
-                                <Plus className="w-3 h-3 text-on-surface-variant" />
-                              )}
-                              {board}
-                            </button>
-                          );
-                        })}
-                      </div>
                     </div>
 
                     {boardError && (
