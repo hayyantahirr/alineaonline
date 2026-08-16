@@ -47,35 +47,21 @@ export default function SubjectsPage() {
   return (
     <div className="w-full bg-[#faf8f2] text-on-background min-h-screen grain-bg">
       {/* Page Header */}
-      <section className="py-16 md:py-24 px-6 border-b-2 border-line bg-[#f5f2e9]/60">
-        <div className="max-w-container-max mx-auto">
-          <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2 mb-4">
-            <span className="w-5 h-0.5 bg-[#c0392b]"></span> Academic
-            Syllabuses
+      <section className="bg-on-background text-white py-14 md:py-20 px-6 border-b-4 border-primary-container relative overflow-hidden">
+        {/* Subtle grid pattern background */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+        
+        <div className="max-w-container-max mx-auto text-center relative z-10">
+          <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+            ACADEMIC SYLLABUSES
           </span>
-          <h1 className="font-['Archivo_Black'] text-4xl sm:text-5xl md:text-6xl text-on-background mb-4 leading-tight">
-            Curriculum Built for{" "}
-            <span className="relative inline-block text-on-background">
-              A* Results
-              <svg
-                className="absolute -bottom-1 left-0 w-full h-3 text-[#c0392b]"
-                viewBox="0 0 100 12"
-                fill="none"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d="M2 8 C 30 2, 70 10, 98 4"
-                  stroke="currentColor"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
+          <h1 className="font-['Archivo_Black'] text-4xl md:text-5xl lg:text-6xl text-white mt-5 mb-5">
+            Curriculum Built for <span className="text-primary-container">A* Results</span>
           </h1>
-          <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+          <p className="font-['Work_Sans'] text-base md:text-lg text-surface-variant max-w-2xl mx-auto leading-relaxed">
             Every subject module is mapped directly to exam board specifications
-            (CAIE, Edexcel, AQA, IB). Select a subject, pick your level and
-            board, and explore the exact curriculum we teach.
+            (CAIE, Edexcel, AQA, IB). Select a subject below to explore the exact
+            mark-scheme-aligned curriculum we teach.
           </p>
         </div>
       </section>
@@ -193,6 +179,27 @@ export default function SubjectsPage() {
           </Link>
         </div>
       </section>
+      {/* Mobile Sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-on-background/95 backdrop-blur-md border-t border-line/20 z-50 lg:hidden flex items-center justify-between gap-4 animate-in slide-in-from-bottom pb-6">
+        <div className="min-w-0">
+          <p className="font-['IBM_Plex_Mono'] text-[10px] text-primary-container font-bold uppercase tracking-wider truncate">
+            {activeSubject?.title}
+          </p>
+          <p className="font-['Work_Sans'] text-xs text-white truncate">
+            with {activeSubject?.tutor?.split(" ")[0]}
+          </p>
+        </div>
+        <Link
+          href={`/booking?teacher=${encodeURIComponent(
+            activeSubject?.tutor || "",
+          )}&subject=${encodeURIComponent(
+            activeSubject?.bookingParam || activeSubject?.title || "",
+          )}`}
+          className="shrink-0 bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs px-5 py-2.5 rounded-full"
+        >
+          Book Now
+        </Link>
+      </div>
     </div>
   );
 }

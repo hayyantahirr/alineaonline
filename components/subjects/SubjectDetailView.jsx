@@ -43,15 +43,27 @@ export default function SubjectDetailView({
           {subject.description}
         </p>
 
-        {/* Tutor */}
-        <div className="flex items-center gap-2 mb-6">
-          <GraduationCap className="w-4 h-4 text-[#c0392b]" />
-          <span className="font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
-            Lead Specialist:
-          </span>
-          <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
-            {subject.tutor}
-          </span>
+        {/* Tutor & Booking */}
+        <div className="flex flex-wrap items-center gap-4 mb-6">
+          <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-lg border border-line">
+            <GraduationCap className="w-4 h-4 text-[#c0392b]" />
+            <span className="font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
+              Lead Specialist:
+            </span>
+            <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
+              {subject.tutor}
+            </span>
+          </div>
+          <Link
+            href={`/booking?teacher=${encodeURIComponent(
+              subject.tutor,
+            )}&subject=${encodeURIComponent(
+              subject.bookingParam || subject.title,
+            )}`}
+            className="font-['Work_Sans'] text-xs font-bold text-on-background bg-primary-container px-4 py-1.5 rounded-full border border-on-background hover:bg-on-background hover:text-primary-container transition-colors"
+          >
+            Book Session with {subject.tutor.split(" ")[0]}
+          </Link>
         </div>
       </div>
 

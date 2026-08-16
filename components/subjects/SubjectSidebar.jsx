@@ -8,7 +8,7 @@ export default function SubjectSidebar({
   onSelectSubject,
 }) {
   return (
-    <aside className="w-full lg:w-64 shrink-0">
+    <aside className="w-full lg:w-64 shrink-0 lg:sticky lg:top-24 lg:self-start">
       <h3 className="font-['Archivo_Black'] text-xs uppercase tracking-wider text-on-background mb-4 pb-2 border-b border-line flex items-center gap-2">
         <BookOpen className="w-4 h-4 text-[#c0392b]" />
         Subjects
