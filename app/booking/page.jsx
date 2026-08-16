@@ -5,10 +5,15 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
   CheckCircle2,
+  User,
+  Sparkles,
   Clock,
   Calendar,
   ShieldCheck,
+  GraduationCap,
   BookOpen,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { subjectsData } from "@/data/subjectsData";
 import { facultyMembers } from "@/data/facultyData";
@@ -83,9 +88,8 @@ function BookingContent() {
   );
 
   // Active level object derived
-  const activeLevelObj = currentLevels.find(
-    (l) => l.label === selectedLevelLabel,
-  ) ||
+  const activeLevelObj =
+    currentLevels.find((l) => l.label === selectedLevelLabel) ||
     currentLevels[0] || { boards: [] };
 
   // Current Boards for active level
@@ -100,7 +104,10 @@ function BookingContent() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(
     "4:00 PM - 5:30 PM GST (Dubai)",
   );
+
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [formData, setFormData] = useState({
     parentName: "",
@@ -181,9 +188,50 @@ function BookingContent() {
     }
   };
 
-  const handleSubmit = (e) => {
+  // Form submission handler communicating with POST /api/booking
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const payload = {
+        parentName: formData.parentName,
+        studentName: formData.studentName,
+        email: formData.email,
+        phone: formData.phone,
+        subject: selectedSubject.title,
+        level: selectedLevelLabel,
+        examBoard: selectedBoardLabel,
+        teacherName: selectedTeacher?.name || "Unassigned Specialist",
+        teacherRole: selectedTeacher?.role || "Subject Specialist",
+        sessionFormat: selectedFormat,
+        timeSlot: selectedTimeSlot,
+        targetGrade: formData.targetGrade || "A*",
+        additionalNotes: formData.additionalNotes || "",
+      };
+
+      const res = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to submit booking request.");
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error("Booking error:", err);
+      setErrorMessage(
+        err.message || "An unexpected error occurred. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const activeBoardObj = currentBoards.find(
@@ -242,14 +290,14 @@ function BookingContent() {
                 {activeBoardObj?.syllabus ? `(${activeBoardObj.syllabus})` : ""}
               </p>
               <p className="text-muted pt-1">
-                🔒 No payment is required today. Session terms and timetable
-                confirmation are completed prior to class.
+                🔒 Saved in real time to Firestore. No payment is required today.
               </p>
             </div>
 
             <button
               onClick={() => {
                 setIsSubmitted(false);
+                setErrorMessage("");
                 setFormData({
                   parentName: "",
                   studentName: "",
@@ -268,6 +316,14 @@ function BookingContent() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             {/* Form Column */}
             <div className="lg:col-span-8 bg-white rounded-3xl p-6 md:p-10 border-2 border-on-background bento-shadow">
+              {/* Error Message Alert */}
+              {errorMessage && (
+                <div className="bg-red-50 border-2 border-red-500 rounded-2xl p-4 mb-6 flex items-center gap-3 text-red-700 font-['Work_Sans'] text-sm">
+                  <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               {/* Dynamic Teacher Badge Banner */}
               {selectedTeacher && (
                 <div className="bg-[#f5f2e9] border-2 border-on-background rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
@@ -580,14 +636,22 @@ function BookingContent() {
 
                 <button
                   type="submit"
-                  className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-base py-4 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-base py-4 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {selectedTeacher
-                    ? `Request Consultation with ${selectedTeacher.name}`
-                    : `Request ${selectedSubject.title} Consultation`}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Saving Request...</span>
+                    </>
+                  ) : selectedTeacher ? (
+                    `Request Consultation with ${selectedTeacher.name}`
+                  ) : (
+                    `Request ${selectedSubject.title} Consultation`
+                  )}
                 </button>
                 <p className="text-center font-['Work_Sans'] text-xs text-muted">
-                  🔒 No payment required today. An Alinea academic coordinator
+                  🔒 Saved in real time to Firestore. An Alinea academic coordinator
                   will manually follow up to confirm your trial session.
                 </p>
               </form>
