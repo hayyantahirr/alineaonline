@@ -41,6 +41,8 @@ export async function POST(request) {
       experienceYears,
       examBoards,
       availability,
+      availabilityHours,
+      availabilitySlots,
       about,
       coverMessage,
       photoUrl,
@@ -152,6 +154,10 @@ export async function POST(request) {
       );
     }
 
+    const sanitizedAvailabilitySlots = Array.isArray(availabilitySlots)
+      ? availabilitySlots.map(sanitize).filter(Boolean)
+      : [];
+
     // Build sanitized application document
     const applicationData = {
       fullName: sanitize(fullName),
@@ -164,6 +170,8 @@ export async function POST(request) {
       experience: resolvedExperience,
       examBoards: sanitizedBoards,
       availability: sanitize(availability) || "Flexible",
+      availabilityHours: sanitize(availabilityHours) || "",
+      availabilitySlots: sanitizedAvailabilitySlots,
       about: resolvedAbout,
       photoUrl: sanitize(photoUrl) || "",
       cvUrl: resolvedCvUrl,

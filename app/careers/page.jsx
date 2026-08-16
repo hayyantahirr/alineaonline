@@ -27,7 +27,8 @@ export default function CareersPage() {
     levels: "",
     experience: "",
     examBoards: [],
-    availability: "",
+    availabilityHours: "",
+    availabilitySlots: [],
     about: "",
   });
   const [photoFile, setPhotoFile] = useState(null);
@@ -51,6 +52,25 @@ export default function CareersPage() {
     "AP (Advanced Placement)",
     "WJEC / Eduqas",
   ];
+
+  const presetSlots = [
+    "Weekday Evenings (4 PM – 9 PM GST)",
+    "Weekend Mornings (9 AM – 1 PM GST)",
+    "Weekend Evenings (2 PM – 9 PM GST)",
+    "Weekday Daytime (10 AM – 4 PM GST)",
+    "Flexible / Any Time",
+  ];
+
+  const toggleAvailabilitySlot = (slot) => {
+    if (!slot) return;
+    setFormData((prev) => {
+      const exists = prev.availabilitySlots.includes(slot);
+      const next = exists
+        ? prev.availabilitySlots.filter((s) => s !== slot)
+        : [...prev.availabilitySlots, slot];
+      return { ...prev, availabilitySlots: next };
+    });
+  };
 
   const toggleExamBoard = (board) => {
     if (!board || !board.trim()) return;
@@ -122,6 +142,16 @@ export default function CareersPage() {
       return;
     }
 
+    if (!formData.availabilityHours) {
+      setSubmitError("Please select your target weekly teaching commitment.");
+      return;
+    }
+
+    if (formData.availabilitySlots.length === 0) {
+      setSubmitError("Please select at least one preferred teaching time slot.");
+      return;
+    }
+
     if (!cvFile) {
       setSubmitError("Please upload your CV / Resume before submitting.");
       return;
@@ -142,6 +172,8 @@ export default function CareersPage() {
         cvUrl = await uploadFileToCloudinary(cvFile, "careers_cvs");
       }
 
+      const formattedAvailability = `${formData.availabilityHours} • Slots: ${formData.availabilitySlots.join(", ")}`;
+
       const res = await fetch("/api/careers", {
         method: "POST",
         headers: {
@@ -149,6 +181,7 @@ export default function CareersPage() {
         },
         body: JSON.stringify({
           ...formData,
+          availability: formattedAvailability,
           photoUrl,
           cvUrl,
           cvType: cvFile ? cvFile.name.split(".").pop().toLowerCase() : "",
@@ -250,7 +283,8 @@ export default function CareersPage() {
                     levels: "",
                     experience: "",
                     examBoards: [],
-                    availability: "",
+                    availabilityHours: "",
+                    availabilitySlots: [],
                     about: "",
                   });
                   setPhotoFile(null);
@@ -796,18 +830,76 @@ export default function CareersPage() {
                       </p>
                     )}
                   </div>
-                  <div className="flex flex-col gap-1.5 sm:col-span-2">
-                    <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
-                      Weekly Availability
-                    </label>
-                    <input
-                      type="text"
-                      name="availability"
-                      value={formData.availability}
-                      onChange={handleChange}
-                      placeholder="e.g. Mon–Fri 4PM–9PM GST, Weekends flexible"
-                      className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3.5 text-on-background placeholder:text-muted focus:border-on-background focus:outline-none transition-colors"
-                    />
+                  {/* Structured Weekly Availability */}
+                  <div className="flex flex-col gap-4 sm:col-span-2 bg-[#fbf9f4] p-5 rounded-2xl border border-line">
+                    <div className="flex items-center justify-between">
+                      <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
+                        Weekly Availability &amp; Teaching Schedule *
+                      </label>
+                      {formData.availabilitySlots.length > 0 && (
+                        <span className="text-[11px] font-semibold text-[#c0392b] bg-[#c0392b]/10 px-2 py-0.5 rounded-md">
+                          {formData.availabilitySlots.length} slot
+                          {formData.availabilitySlots.length > 1 ? "s" : ""} selected
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Commitment Dropdown */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-['Work_Sans'] font-medium text-xs text-on-surface-variant">
+                        Target Hours Commitment *
+                      </label>
+                      <select
+                        name="availabilityHours"
+                        value={formData.availabilityHours}
+                        onChange={handleChange}
+                        required
+                        className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3.5 text-on-background focus:border-on-background focus:outline-none transition-colors appearance-none cursor-pointer"
+                      >
+                        <option value="">Select weekly commitment</option>
+                        <option>5–10 hours / week (Part-time)</option>
+                        <option>10–20 hours / week (Regular / Standard)</option>
+                        <option>20–30 hours / week (High Commitment)</option>
+                        <option>30+ hours / week (Full-time)</option>
+                      </select>
+                    </div>
+
+                    {/* Preferred Teaching Time Slots */}
+                    <div className="flex flex-col gap-2">
+                      <label className="font-['Work_Sans'] font-medium text-xs text-on-surface-variant">
+                        Preferred Teaching Slots (Select all that apply) *
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                        {presetSlots.map((slot) => {
+                          const isSelected = formData.availabilitySlots.includes(slot);
+                          return (
+                            <button
+                              key={slot}
+                              type="button"
+                              onClick={() => toggleAvailabilitySlot(slot)}
+                              className={`flex items-center gap-2.5 p-3 rounded-xl border-2 text-left font-['Work_Sans'] text-xs font-bold transition-all cursor-pointer select-none ${
+                                isSelected
+                                  ? "bg-on-background text-white border-on-background shadow-[3px_3px_0_0_rgba(25,28,29,0.3)]"
+                                  : "bg-white text-on-background border-line hover:border-on-background/50 hover:bg-[#faf8f2]"
+                              }`}
+                            >
+                              <div
+                                className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                                  isSelected
+                                    ? "bg-[#c0392b] border-[#c0392b] text-white"
+                                    : "border-muted bg-white"
+                                }`}
+                              >
+                                {isSelected && (
+                                  <Check className="w-3 h-3 stroke-3" />
+                                )}
+                              </div>
+                              <span className="truncate">{slot}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
