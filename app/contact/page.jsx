@@ -3,8 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Send, Clock, MapPin, Mail, Loader2 } from "lucide-react";
-import { db } from "@/config/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -29,24 +27,25 @@ export default function ContactPage() {
     setErrorMessage("");
 
     try {
-      console.log("Submitting contact form to Firestore database...", formData);
-      const docRef = await addDoc(collection(db, "contact_messages"), {
-        parentName: formData.parentName,
-        studentName: formData.studentName,
-        email: formData.email,
-        phone: formData.phone,
-        subject: formData.subject,
-        message: formData.message,
-        createdAt: serverTimestamp(),
-        status: "unread",
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-      console.log("Contact message saved successfully with Document ID:", docRef.id);
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send message. Please try again.");
+      }
+
       setIsSubmitted(true);
     } catch (err) {
-      console.error("Firestore submission error:", err);
-      const detail = err.code ? `[${err.code}] ${err.message}` : err.message;
+      console.error("Contact submission error:", err);
       setErrorMessage(
-        `Firebase Error: ${detail || "Could not save message to Firestore."}`
+        err.message || "Could not submit your message. Please try again."
       );
     } finally {
       setIsLoading(false);

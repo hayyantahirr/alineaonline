@@ -14,8 +14,6 @@ import {
   ArrowDown,
   Sparkles,
 } from "lucide-react";
-import { db } from "@/config/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import TeacherRubricVisual from "@/components/careers/TeacherRubricVisual";
 
 export default function CareersPage() {
@@ -144,32 +142,30 @@ export default function CareersPage() {
         cvUrl = await uploadFileToCloudinary(cvFile, "careers_cvs");
       }
 
-      const docRef = await addDoc(collection(db, "career_applications"), {
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        country: formData.country,
-        city: formData.city,
-        subject: formData.subject,
-        levels: formData.levels,
-        experience: formData.experience,
-        examBoards: formData.examBoards,
-        availability: formData.availability,
-        about: formData.about,
-        photoUrl: photoUrl,
-        cvUrl: cvUrl,
-        cvType: cvFile ? cvFile.name.split('.').pop().toLowerCase() : "",
-        createdAt: serverTimestamp(),
-        status: "unread",
+      const res = await fetch("/api/careers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          photoUrl,
+          cvUrl,
+          cvType: cvFile ? cvFile.name.split(".").pop().toLowerCase() : "",
+        }),
       });
 
-      console.log("Career application saved to Firestore with ID:", docRef.id);
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit application. Please try again.");
+      }
+
       setIsSubmitted(true);
     } catch (err) {
       console.error("Career application submission error:", err);
-      const detail = err.code ? `[${err.code}] ${err.message}` : err.message;
       setSubmitError(
-        `Submission failed: ${detail || "Could not submit application."}`,
+        err.message || "Could not submit application. Please try again."
       );
     } finally {
       setIsSubmitting(false);
