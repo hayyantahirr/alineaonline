@@ -2,7 +2,62 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle2, User, Sparkles, Clock, Calendar, ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import {
+  CheckCircle2,
+  Clock,
+  Calendar,
+  ShieldCheck,
+  BookOpen,
+} from "lucide-react";
+import { subjectsData } from "@/data/subjectsData";
+import { facultyMembers } from "@/data/facultyData";
+
+// Helper to find teacher from URL param or name
+const findTeacherByParam = (param) => {
+  if (!param) return null;
+  const lower = param.toLowerCase();
+  return facultyMembers.find(
+    (t) =>
+      t.name.toLowerCase().includes(lower) ||
+      lower.includes(t.name.toLowerCase()) ||
+      t.id === lower,
+  );
+};
+
+// Helper to find subject from URL param or name
+const findSubjectByParam = (param) => {
+  if (!param) return subjectsData[0];
+  const lower = param.toLowerCase();
+  return (
+    subjectsData.find(
+      (s) =>
+        s.id.toLowerCase() === lower ||
+        s.title.toLowerCase().includes(lower) ||
+        lower.includes(s.title.toLowerCase()),
+    ) || subjectsData[0]
+  );
+};
+
+// Helper to find lead teacher for a given subject
+const getLeadTeacherForSubject = (subjectObj) => {
+  if (!subjectObj) return facultyMembers[0];
+  const leadNameFirstWord = subjectObj.tutor
+    ? subjectObj.tutor.split(" ")[0].toLowerCase()
+    : "";
+  const found = facultyMembers.find(
+    (f) =>
+      f.name.toLowerCase().includes(leadNameFirstWord) ||
+      f.subject
+        .toLowerCase()
+        .includes(subjectObj.title.toLowerCase().split(" ")[0]) ||
+      (f.subjectBookingParam &&
+        subjectObj.title
+          .toLowerCase()
+          .includes(f.subjectBookingParam.toLowerCase())),
+  );
+  return found || facultyMembers[0];
+};
 
 function BookingContent() {
   const searchParams = useSearchParams();
@@ -10,10 +65,38 @@ function BookingContent() {
   const subjectParam = searchParams.get("subject");
   const levelParam = searchParams.get("level");
 
-  const [preferredTeacher, setPreferredTeacher] = useState(teacherParam || "");
-  const [selectedSubject, setSelectedSubject] = useState(subjectParam || "Economics");
-  const [selectedLevel, setSelectedLevel] = useState(levelParam || "A-Level");
-  const [selectedFormat, setSelectedFormat] = useState("1:1 Intensive");
+  // Initial State derived dynamically from parameters or defaults
+  const [selectedSubject, setSelectedSubject] = useState(() =>
+    findSubjectByParam(subjectParam),
+  );
+  const [selectedTeacher, setSelectedTeacher] = useState(() => {
+    const fromTeacherParam = findTeacherByParam(teacherParam);
+    if (fromTeacherParam) return fromTeacherParam;
+    const initialSub = findSubjectByParam(subjectParam);
+    return getLeadTeacherForSubject(initialSub);
+  });
+
+  // Current Level Object (derived from selectedSubject)
+  const currentLevels = selectedSubject.levels || [];
+  const [selectedLevelLabel, setSelectedLevelLabel] = useState(
+    () => levelParam || currentLevels[0]?.label || "A-Level",
+  );
+
+  // Active level object derived
+  const activeLevelObj = currentLevels.find(
+    (l) => l.label === selectedLevelLabel,
+  ) ||
+    currentLevels[0] || { boards: [] };
+
+  // Current Boards for active level
+  const currentBoards = activeLevelObj.boards || [];
+  const [selectedBoardLabel, setSelectedBoardLabel] = useState(
+    () => currentBoards[0]?.label || "Edexcel (Pearson)",
+  );
+
+  const [selectedFormat, setSelectedFormat] = useState(
+    "1:1 Intensive Mentorship",
+  );
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(
     "4:00 PM - 5:30 PM GST (Dubai)",
   );
@@ -24,57 +107,112 @@ function BookingContent() {
     studentName: "",
     email: "",
     phone: "",
-    examBoard: "Edexcel International",
     targetGrade: "A*",
     additionalNotes: "",
   });
 
+  // Synchronize URL search params if they change dynamically
   useEffect(() => {
-    if (teacherParam) setPreferredTeacher(teacherParam);
-    if (subjectParam) setSelectedSubject(subjectParam);
-    if (levelParam) setSelectedLevel(levelParam);
-  }, [teacherParam, subjectParam, levelParam]);
+    if (teacherParam) {
+      const t = findTeacherByParam(teacherParam);
+      if (t) {
+        setSelectedTeacher(t);
+        // Find subject matching teacher
+        const matchingSub = subjectsData.find(
+          (s) =>
+            s.title
+              .toLowerCase()
+              .includes(t.subjectBookingParam?.toLowerCase() || "") ||
+            t.subject
+              .toLowerCase()
+              .includes(s.title.toLowerCase().split(" ")[0]),
+        );
+        if (matchingSub) setSelectedSubject(matchingSub);
+      }
+    } else if (subjectParam) {
+      const s = findSubjectByParam(subjectParam);
+      setSelectedSubject(s);
+      const lead = getLeadTeacherForSubject(s);
+      setSelectedTeacher(lead);
+    }
+  }, [teacherParam, subjectParam]);
 
-  const availableSubjects = [
-    "Economics",
-    "Mathematics",
-    "Physics",
-    "Biology",
-    "English",
-    "Business",
-    "Accounting",
-    "Chemistry",
-    "Computer Science",
-  ];
+  // Keep Level and Board valid when Subject changes
+  useEffect(() => {
+    if (selectedSubject && selectedSubject.levels?.length > 0) {
+      const firstLevel = selectedSubject.levels[0];
+      setSelectedLevelLabel(firstLevel.label);
+      if (firstLevel.boards?.length > 0) {
+        setSelectedBoardLabel(firstLevel.boards[0].label);
+      }
+    }
+  }, [selectedSubject]);
+
+  // Keep Board valid when Level changes
+  useEffect(() => {
+    if (activeLevelObj && activeLevelObj.boards?.length > 0) {
+      setSelectedBoardLabel(activeLevelObj.boards[0].label);
+    }
+  }, [selectedLevelLabel]);
+
+  // Handler when user selects a Subject button
+  const handleSelectSubject = (subject) => {
+    setSelectedSubject(subject);
+    const leadTeacher = getLeadTeacherForSubject(subject);
+    setSelectedTeacher(leadTeacher);
+  };
+
+  // Handler when user selects a Teacher dropdown
+  const handleSelectTeacher = (teacherId) => {
+    const t = facultyMembers.find((f) => f.id === teacherId);
+    if (!t) return;
+    setSelectedTeacher(t);
+
+    // Auto-select corresponding subject if available
+    const matchingSub = subjectsData.find(
+      (s) =>
+        s.title
+          .toLowerCase()
+          .includes(t.subjectBookingParam?.toLowerCase() || "") ||
+        t.subject.toLowerCase().includes(s.title.toLowerCase().split(" ")[0]),
+    );
+    if (matchingSub) {
+      setSelectedSubject(matchingSub);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitted(true);
   };
 
+  const activeBoardObj = currentBoards.find(
+    (b) => b.label === selectedBoardLabel,
+  );
+
   return (
-    <div className="w-full bg-background text-on-background">
+    <div className="w-full bg-[#faf8f2] text-on-background grain-bg min-h-screen">
       {/* Header */}
       <section className="bg-on-background text-white py-14 px-6 border-b-4 border-primary-container">
         <div className="max-w-container-max mx-auto text-center">
-          <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+          <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
             RESERVE YOUR ACADEMIC CONSULTATION
           </span>
-          <h1 className="font-['Archivo_Black'] text-4xl md:text-5xl text-primary-container mt-3 mb-3">
-            {preferredTeacher
-              ? `Book a Session with ${preferredTeacher}`
-              : "Book a Session with Alinea Online"}
+          <h1 className="font-['Archivo_Black'] text-3xl md:text-5xl text-primary-container mt-4 mb-3">
+            {selectedTeacher
+              ? `Book a Session with ${selectedTeacher.name}`
+              : `Book Your ${selectedSubject.title} Consultation`}
           </h1>
-          <p className="font-['Work_Sans'] text-base md:text-lg text-surface-variant max-w-xl mx-auto">
-            {preferredTeacher
-              ? `Submit your details below to arrange a 1:1 diagnostic consultation or trial with ${preferredTeacher}. Our academic team will contact you to confirm timing.`
-              : "Select your target subject, current level, and preferred consultation time slot below."}
+          <p className="font-['Work_Sans'] text-base md:text-lg text-surface-variant max-w-2xl mx-auto leading-relaxed">
+            Select your target subject, preferred examiner specialist, and time
+            slot below. Our academic team will manually confirm your trial
+            session within 2 hours.
           </p>
         </div>
       </section>
 
       {/* Main Booking Container */}
-      <section className="py-14 md:py-20 px-6 max-w-container-max mx-auto">
+      <section className="py-12 md:py-18 px-6 max-w-container-max mx-auto">
         {isSubmitted ? (
           <div className="bg-primary-container text-on-background p-8 md:p-14 rounded-3xl border-2 border-on-background neo-brutalist-shadow text-center max-w-2xl mx-auto">
             <div className="w-16 h-16 bg-on-background text-primary-container rounded-full flex items-center justify-center mx-auto mb-6">
@@ -88,29 +226,27 @@ function BookingContent() {
               senior academic coordinator will reach out to you via WhatsApp /
               email within <strong>2 hours</strong> to confirm your{" "}
               <strong>
-                {selectedSubject} ({selectedLevel})
+                {selectedSubject.title} ({selectedLevelLabel})
               </strong>{" "}
-              session slot
-              {preferredTeacher ? (
-                <>
-                  {" "}
-                  with <strong>{preferredTeacher}</strong>
-                </>
-              ) : (
-                ""
-              )}
-              .
+              session slot with <strong>{selectedTeacher?.name}</strong>.
             </p>
-            <div className="bg-white/70 rounded-2xl p-4 border border-on-background mb-6 text-left font-['Work_Sans'] text-xs text-on-surface-variant space-y-1.5">
-              <p>
-                <strong>Next Steps:</strong> An Alinea rep will manually verify teacher
-                availability and match your preferred time slot ({selectedTimeSlot}).
+
+            <div className="bg-white/80 rounded-2xl p-5 border border-on-background mb-6 text-left font-['Work_Sans'] text-xs text-on-surface-variant space-y-2">
+              <p className="flex items-center gap-2 text-on-background font-bold">
+                <Clock className="w-4 h-4 text-[#c0392b]" />
+                Preferred Slot: {selectedTimeSlot}
               </p>
-              <p>
-                No payment is required today — consultation terms are confirmed
-                prior to the session.
+              <p className="flex items-center gap-2 text-on-background font-bold">
+                <BookOpen className="w-4 h-4 text-[#c0392b]" />
+                Exam Board: {selectedBoardLabel}{" "}
+                {activeBoardObj?.syllabus ? `(${activeBoardObj.syllabus})` : ""}
+              </p>
+              <p className="text-muted pt-1">
+                🔒 No payment is required today. Session terms and timetable
+                confirmation are completed prior to class.
               </p>
             </div>
+
             <button
               onClick={() => {
                 setIsSubmitted(false);
@@ -119,12 +255,11 @@ function BookingContent() {
                   studentName: "",
                   email: "",
                   phone: "",
-                  examBoard: "Edexcel International",
                   targetGrade: "A*",
                   additionalNotes: "",
                 });
               }}
-              className="bg-on-background text-white font-['Work_Sans'] font-bold text-sm px-8 py-3.5 rounded-full border border-white hover:bg-black transition-colors"
+              className="bg-on-background text-white font-['Work_Sans'] font-bold text-sm px-8 py-3.5 rounded-full border border-white hover:bg-black transition-colors cursor-pointer"
             >
               Book Another Session
             </button>
@@ -133,103 +268,167 @@ function BookingContent() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             {/* Form Column */}
             <div className="lg:col-span-8 bg-white rounded-3xl p-6 md:p-10 border-2 border-on-background bento-shadow">
-              {/* Teacher Pre-fill Notice Banner */}
-              {preferredTeacher && (
-                <div className="bg-primary-container/20 border-2 border-on-background rounded-2xl p-4 md:p-5 flex items-center justify-between gap-4 mb-8">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-xl bg-primary-container border border-on-background flex items-center justify-center font-bold text-on-background shrink-0">
-                      <User className="w-5 h-5" />
+              {/* Dynamic Teacher Badge Banner */}
+              {selectedTeacher && (
+                <div className="bg-[#f5f2e9] border-2 border-on-background rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-on-background shrink-0 relative">
+                      <Image
+                        src={selectedTeacher.image}
+                        alt={selectedTeacher.name}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
                     <div>
-                      <span className="font-['IBM_Plex_Mono'] text-[11px] font-bold uppercase text-[#c0392b] tracking-wider block">
-                        Requested Faculty Specialist
-                      </span>
-                      <h4 className="font-['Archivo_Black'] text-base md:text-lg text-on-background">
-                        {preferredTeacher}
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-['IBM_Plex_Mono'] text-[10px] font-bold uppercase text-[#c0392b] tracking-wider">
+                          ASSIGNED FACULTY SPECIALIST
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 font-['IBM_Plex_Mono'] text-[9px] font-bold px-2 py-0.2 rounded-full border ${
+                            selectedTeacher.availabilityStatus === "available"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                              : "bg-amber-50 text-amber-800 border-amber-300"
+                          }`}
+                        >
+                          ● {selectedTeacher.availability}
+                        </span>
+                      </div>
+                      <h4 className="font-['Archivo_Black'] text-lg text-on-background flex items-center gap-2">
+                        {selectedTeacher.name}
+                        <span className="font-['Work_Sans'] text-xs font-normal text-on-surface-variant">
+                          ({selectedTeacher.qualification})
+                        </span>
                       </h4>
                       <p className="font-['Work_Sans'] text-xs text-on-surface-variant">
-                        Assigned for {selectedSubject} consultation
+                        {selectedTeacher.role} · {selectedTeacher.experience}{" "}
+                        Exp.
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setPreferredTeacher("")}
-                    className="text-xs font-['Work_Sans'] font-bold text-on-surface-variant hover:text-on-background underline underline-offset-2 shrink-0 cursor-pointer"
-                  >
-                    Change / Clear
-                  </button>
+
+                  {/* Change Teacher Dropdown */}
+                  <div className="w-full sm:w-auto">
+                    <label className="block font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-on-surface-variant mb-1">
+                      Switch Specialist:
+                    </label>
+                    <select
+                      value={selectedTeacher.id}
+                      onChange={(e) => handleSelectTeacher(e.target.value)}
+                      className="w-full sm:w-auto p-2 bg-white border border-on-background rounded-xl font-['Work_Sans'] text-xs font-bold focus:outline-none cursor-pointer"
+                    >
+                      {facultyMembers.map((fac) => (
+                        <option key={fac.id} value={fac.id}>
+                          {fac.name} ({fac.subject.split(" ")[0]})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Step 1: Subject Selection */}
+                {/* Step 1: Target Subject Selection (Dynamic from subjectsData) */}
                 <div>
-                  <label className="block font-['Archivo_Black'] text-lg text-on-background mb-3">
-                    1. Select Target Subject
-                  </label>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="font-['Archivo_Black'] text-lg text-on-background">
+                      1. Select Target Subject
+                    </label>
+                    <span className="font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
+                      {subjectsData.length} Subjects Available
+                    </span>
+                  </div>
+
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    {availableSubjects.map((sub) => {
-                      const isSelected =
-                        selectedSubject.toLowerCase().includes(sub.toLowerCase()) ||
-                        sub.toLowerCase().includes(selectedSubject.toLowerCase());
+                    {subjectsData.map((sub) => {
+                      const isSelected = selectedSubject.id === sub.id;
 
                       return (
                         <button
                           type="button"
-                          key={sub}
-                          onClick={() => setSelectedSubject(sub)}
-                          className={`p-3 rounded-xl border-2 font-['Work_Sans'] font-bold text-xs md:text-sm text-center transition-all cursor-pointer ${
+                          key={sub.id}
+                          onClick={() => handleSelectSubject(sub)}
+                          className={`p-3.5 rounded-xl border-2 font-['Work_Sans'] font-bold text-xs md:text-sm text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
                             isSelected
                               ? "bg-primary-container border-on-background text-on-background neo-brutalist-shadow"
                               : "bg-background border-line text-on-surface-variant hover:bg-surface-container hover:border-on-background/40"
                           }`}
                         >
-                          {sub}
+                          <div className="flex items-center justify-between">
+                            <span className="font-['IBM_Plex_Mono'] text-[10px] font-bold text-[#c0392b]">
+                              {sub.num}
+                            </span>
+                            {sub.badgeType === "red-outline" && (
+                              <span className="font-['IBM_Plex_Mono'] text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#c0392b] text-[#c0392b]">
+                                {sub.tag}
+                              </span>
+                            )}
+                          </div>
+                          <span className="line-clamp-1">{sub.title}</span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Step 2: Level & Exam Board */}
+                {/* Step 2: Dynamic Levels & Exam Boards (Derived from selectedSubject) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-2">
-                      Academic Level *
+                      Academic Level * (Dynamic for {selectedSubject.title})
                     </label>
                     <select
-                      value={selectedLevel}
-                      onChange={(e) => setSelectedLevel(e.target.value)}
+                      value={selectedLevelLabel}
+                      onChange={(e) => setSelectedLevelLabel(e.target.value)}
                       className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors appearance-none cursor-pointer"
                     >
-                      <option value="IGCSE / O-Level">IGCSE / O-Level</option>
-                      <option value="AS-Level">AS-Level</option>
-                      <option value="A-Level">A2 / Full A-Level</option>
-                      <option value="IB Diploma (SL/HL)">IB Diploma (SL/HL)</option>
+                      {currentLevels.map((lvl) => (
+                        <option key={lvl.id} value={lvl.label}>
+                          {lvl.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
                   <div>
                     <label className="block font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-2">
-                      Exam Board *
+                      Exam Board * (Dynamic for {selectedLevelLabel})
                     </label>
                     <select
-                      value={formData.examBoard}
-                      onChange={(e) =>
-                        setFormData({ ...formData, examBoard: e.target.value })
-                      }
+                      value={selectedBoardLabel}
+                      onChange={(e) => setSelectedBoardLabel(e.target.value)}
                       className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors appearance-none cursor-pointer"
                     >
-                      <option value="Edexcel International">Edexcel International (IAL)</option>
-                      <option value="CAIE Cambridge">CAIE Cambridge (CAIE)</option>
-                      <option value="AQA UK">AQA Specification</option>
-                      <option value="OCR">OCR</option>
-                      <option value="IB Diploma">IB International Baccalaureate</option>
-                      <option value="Other / Multiple">Other / Multiple Boards</option>
+                      {currentBoards.map((brd) => (
+                        <option key={brd.id} value={brd.label}>
+                          {brd.label}{" "}
+                          {brd.syllabus ? `(Syllabus ${brd.syllabus})` : ""}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
+
+                {/* Modules Preview Badge */}
+                {activeBoardObj?.modules &&
+                  activeBoardObj.modules.length > 0 && (
+                    <div className="bg-[#f5f2e9]/70 rounded-2xl p-4 border border-line space-y-2">
+                      <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-[#c0392b] tracking-wider block">
+                        Target Curriculum Modules ({selectedBoardLabel}):
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {activeBoardObj.modules.map((mod, idx) => (
+                          <span
+                            key={idx}
+                            className="font-['Work_Sans'] text-xs bg-white px-2.5 py-1 rounded-lg border border-line text-on-background font-medium"
+                          >
+                            • {mod}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                 {/* Step 3: Session Format */}
                 <div>
@@ -240,7 +439,7 @@ function BookingContent() {
                     {[
                       {
                         title: "1:1 Intensive Mentorship",
-                        desc: "Personalized focus with your chosen subject specialist",
+                        desc: `Personalized 1:1 focus with ${selectedTeacher?.name || "Specialist"}`,
                       },
                       {
                         title: "Small Group Masterclass (Max 4)",
@@ -320,7 +519,10 @@ function BookingContent() {
                         placeholder="e.g. Sarah Ahmad"
                         value={formData.parentName}
                         onChange={(e) =>
-                          setFormData({ ...formData, parentName: e.target.value })
+                          setFormData({
+                            ...formData,
+                            parentName: e.target.value,
+                          })
                         }
                         className="w-full p-3 bg-white border-2 border-line rounded-xl text-sm font-['Work_Sans'] focus:border-on-background focus:outline-none"
                       />
@@ -335,7 +537,10 @@ function BookingContent() {
                         placeholder="e.g. Tariq Ahmad"
                         value={formData.studentName}
                         onChange={(e) =>
-                          setFormData({ ...formData, studentName: e.target.value })
+                          setFormData({
+                            ...formData,
+                            studentName: e.target.value,
+                          })
                         }
                         className="w-full p-3 bg-white border-2 border-line rounded-xl text-sm font-['Work_Sans'] focus:border-on-background focus:outline-none"
                       />
@@ -377,33 +582,46 @@ function BookingContent() {
                   type="submit"
                   className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-base py-4 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform cursor-pointer"
                 >
-                  {preferredTeacher
-                    ? `Request Consultation with ${preferredTeacher}`
-                    : "Confirm Consultation Request"}
+                  {selectedTeacher
+                    ? `Request Consultation with ${selectedTeacher.name}`
+                    : `Request ${selectedSubject.title} Consultation`}
                 </button>
                 <p className="text-center font-['Work_Sans'] text-xs text-muted">
-                  🔒 No payment required today. An Alinea academic coordinator will
-                  manually follow up to arrange your trial/demo session.
+                  🔒 No payment required today. An Alinea academic coordinator
+                  will manually follow up to confirm your trial session.
                 </p>
               </form>
             </div>
 
-            {/* Live Summary Sidebar */}
+            {/* Dynamic Live Summary Sidebar */}
             <div className="lg:col-span-4 flex flex-col gap-6 sticky top-24">
               <div className="bg-on-background text-white p-6 md:p-7 rounded-3xl border-2 border-on-background shadow-lg">
                 <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                   CONSULTATION SUMMARY
                 </span>
 
-                <div className="my-6 border-b border-white/15 pb-5 space-y-3.5">
-                  {preferredTeacher && (
-                    <div>
-                      <p className="font-['IBM_Plex_Mono'] text-[11px] text-primary-container uppercase font-bold">
-                        Requested Teacher
-                      </p>
-                      <p className="font-['Archivo_Black'] text-white text-base">
-                        {preferredTeacher}
-                      </p>
+                <div className="my-6 border-b border-white/15 pb-5 space-y-4">
+                  {selectedTeacher && (
+                    <div className="flex items-center gap-3.5 bg-white/10 p-3 rounded-2xl border border-white/10">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden relative shrink-0 border border-primary-container">
+                        <Image
+                          src={selectedTeacher.image}
+                          alt={selectedTeacher.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-['IBM_Plex_Mono'] text-[10px] text-primary-container uppercase font-bold">
+                          Lead Examiner
+                        </p>
+                        <p className="font-['Archivo_Black'] text-white text-sm truncate">
+                          {selectedTeacher.name}
+                        </p>
+                        <p className="font-['Work_Sans'] text-[11px] text-surface-variant truncate">
+                          {selectedTeacher.qualification}
+                        </p>
+                      </div>
                     </div>
                   )}
 
@@ -411,8 +629,34 @@ function BookingContent() {
                     <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
                       Target Subject
                     </p>
-                    <p className="font-['Archivo_Black'] text-primary-container text-lg">
-                      {selectedSubject} ({selectedLevel})
+                    <p className="font-['Archivo_Black'] text-primary-container text-lg leading-snug">
+                      {selectedSubject.title}
+                    </p>
+                    <p className="font-['Work_Sans'] text-xs text-white/80">
+                      Level: {selectedLevelLabel}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
+                      Exam Board Alignment
+                    </p>
+                    <p className="font-['Work_Sans'] font-bold text-white text-sm">
+                      {selectedBoardLabel}
+                    </p>
+                    {activeBoardObj?.syllabus && (
+                      <p className="font-['IBM_Plex_Mono'] text-[11px] text-primary-container">
+                        Syllabus Code: {activeBoardObj.syllabus}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
+                      Selected Slot
+                    </p>
+                    <p className="font-['IBM_Plex_Mono'] text-xs text-primary-container font-bold">
+                      {selectedTimeSlot}
                     </p>
                   </div>
 
@@ -420,26 +664,8 @@ function BookingContent() {
                     <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
                       Format
                     </p>
-                    <p className="font-['Work_Sans'] font-bold text-white text-sm">
+                    <p className="font-['Work_Sans'] text-xs text-surface-variant font-bold">
                       {selectedFormat}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
-                      Selected Slot
-                    </p>
-                    <p className="font-['IBM_Plex_Mono'] text-xs text-primary-container">
-                      {selectedTimeSlot}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
-                      Exam Board
-                    </p>
-                    <p className="font-['Work_Sans'] text-xs text-surface-variant">
-                      {formData.examBoard}
                     </p>
                   </div>
                 </div>
@@ -447,20 +673,21 @@ function BookingContent() {
                 <div className="bg-white/10 p-4 rounded-2xl border border-white/10 space-y-2.5 mb-5">
                   <div className="flex items-center gap-2 text-xs font-['Work_Sans'] text-primary-container font-bold">
                     <ShieldCheck className="w-4 h-4 shrink-0" />
-                    <span>Examiner-led feedback guarantee</span>
+                    <span>Mark-scheme first diagnostic audit</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-['Work_Sans'] text-surface-variant">
                     <Clock className="w-4 h-4 shrink-0" />
-                    <span>Initial diagnostic session: 45 Mins</span>
+                    <span>Initial session: 45 Minutes</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-['Work_Sans'] text-surface-variant">
                     <Calendar className="w-4 h-4 shrink-0" />
-                    <span>Manual scheduling confirmation within 2h</span>
+                    <span>Confirmation within 2 hours</span>
                   </div>
                 </div>
 
                 <p className="text-[11px] text-muted text-center font-['IBM_Plex_Mono'] leading-relaxed">
-                  Confirmation and schedule matching is handled directly by an Alinea academic representative.
+                  Confirmation and schedule matching is handled directly by an
+                  Alinea academic representative.
                 </p>
               </div>
             </div>
