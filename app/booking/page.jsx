@@ -290,7 +290,7 @@ function BookingContent() {
                 {activeBoardObj?.syllabus ? `(${activeBoardObj.syllabus})` : ""}
               </p>
               <p className="text-muted pt-1">
-                🔒 Saved in real time to Firestore. No payment is required today.
+               No payment is required today.
               </p>
             </div>
 
@@ -651,7 +651,7 @@ function BookingContent() {
                   )}
                 </button>
                 <p className="text-center font-['Work_Sans'] text-xs text-muted">
-                  🔒 Saved in real time to Firestore. An Alinea academic coordinator
+                   An Alinea academic coordinator
                   will manually follow up to confirm your trial session.
                 </p>
               </form>
