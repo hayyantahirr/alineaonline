@@ -90,7 +90,10 @@ export default function FacultyPage() {
                 key={teacher.id}
                 className="bg-white rounded-2xl border-2 border-line hover:border-on-background hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-on-background)] transition-transform duration-200 flex flex-col justify-between overflow-hidden group"
               >
-                <div onClick={() => setSelectedTeacher(teacher)} className="cursor-pointer">
+                <div
+                  onClick={() => setSelectedTeacher(teacher)}
+                  className="cursor-pointer"
+                >
                   {/* Card Header: Photo + Core Info */}
                   <div className="p-5 md:p-6 pb-4">
                     <div className="flex items-start gap-4">
