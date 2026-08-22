@@ -40,6 +40,7 @@ export async function POST(request) {
       experience,
       experienceYears,
       examBoards,
+      highlights,
       availability,
       availabilityHours,
       availabilitySlots,
@@ -52,7 +53,7 @@ export async function POST(request) {
     } = body;
 
     // Resolve field aliases
-    const resolvedSubject = sanitize(subject || positionAppliedFor);
+    const resolvedSubject = sanitize(subject || positionAppliedFor).toLowerCase();
     const resolvedExperience = sanitize(experience || experienceYears);
     const resolvedAbout = sanitize(about || coverMessage);
     const resolvedCvUrl = (cvUrl || portfolioOrResumeUrl || "")
@@ -154,6 +155,21 @@ export async function POST(request) {
       );
     }
 
+    const sanitizedHighlights = Array.isArray(highlights)
+      ? highlights.map(sanitize).filter((h) => h.length > 0)
+      : [];
+
+    if (sanitizedHighlights.length < 3) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Please provide at least 3 key teaching highlights & methodology points.",
+        },
+        { status: 400 },
+      );
+    }
+
     const sanitizedAvailabilitySlots = Array.isArray(availabilitySlots)
       ? availabilitySlots.map(sanitize).filter(Boolean)
       : [];
@@ -172,6 +188,7 @@ export async function POST(request) {
       availability: sanitize(availability) || "Flexible",
       availabilityHours: sanitize(availabilityHours) || "",
       availabilitySlots: sanitizedAvailabilitySlots,
+      highlights: sanitizedHighlights,
       about: resolvedAbout,
       photoUrl: sanitize(photoUrl) || "",
       cvUrl: resolvedCvUrl,

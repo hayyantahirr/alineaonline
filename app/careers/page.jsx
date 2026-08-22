@@ -29,6 +29,7 @@ export default function CareersPage() {
     examBoards: [],
     availabilityHours: "",
     availabilitySlots: [],
+    highlights: ["", "", ""],
     about: "",
   });
   const [photoFile, setPhotoFile] = useState(null);
@@ -112,6 +113,33 @@ export default function CareersPage() {
     }
   };
 
+  const handleHighlightChange = (index, value) => {
+    setFormData((prev) => {
+      const nextHighlights = [...prev.highlights];
+      nextHighlights[index] = value;
+      return { ...prev, highlights: nextHighlights };
+    });
+  };
+
+  const addHighlightField = () => {
+    setFormData((prev) => ({
+      ...prev,
+      highlights: [...prev.highlights, ""],
+    }));
+  };
+
+  const removeHighlightField = (index) => {
+    setFormData((prev) => {
+      if (prev.highlights.length <= 3) {
+        return prev;
+      }
+      return {
+        ...prev,
+        highlights: prev.highlights.filter((_, i) => i !== index),
+      };
+    });
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -137,8 +165,22 @@ export default function CareersPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.subject || !formData.subject.trim()) {
+      setSubmitError("Please provide the subject(s) you teach.");
+      return;
+    }
+
     if (formData.examBoards.length === 0) {
       setBoardError("Please select or add at least one exam board.");
+      return;
+    }
+
+    const cleanedHighlights = formData.highlights
+      .map((h) => h.trim())
+      .filter((h) => h.length > 0);
+
+    if (cleanedHighlights.length < 3) {
+      setSubmitError("Please provide at least 3 key teaching highlights & methodology points.");
       return;
     }
 
@@ -173,6 +215,7 @@ export default function CareersPage() {
       }
 
       const formattedAvailability = `${formData.availabilityHours} • Slots: ${formData.availabilitySlots.join(", ")}`;
+      const cleanedSubject = formData.subject.trim().toLowerCase();
 
       const res = await fetch("/api/careers", {
         method: "POST",
@@ -181,6 +224,8 @@ export default function CareersPage() {
         },
         body: JSON.stringify({
           ...formData,
+          subject: cleanedSubject,
+          highlights: cleanedHighlights,
           availability: formattedAvailability,
           photoUrl,
           cvUrl,
@@ -285,6 +330,7 @@ export default function CareersPage() {
                     examBoards: [],
                     availabilityHours: "",
                     availabilitySlots: [],
+                    highlights: ["", "", ""],
                     about: "",
                   });
                   setPhotoFile(null);
@@ -510,7 +556,7 @@ export default function CareersPage() {
                   </span>
                   <div>
                     <strong className="text-on-background">
-                      Onboarding & First Students
+                      Onboarding &amp; First Students
                     </strong>
                     <p className="text-on-surface-variant">
                       Match with students and begin teaching within a week.
@@ -636,26 +682,32 @@ export default function CareersPage() {
                     <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
                       Subject(s) You Teach *
                     </label>
-                    <select
+                    <input
+                      type="text"
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
                       required
-                      className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3.5 text-on-background focus:border-on-background focus:outline-none transition-colors appearance-none cursor-pointer"
-                    >
-                      <option value="">Select primary subject</option>
-                      <option>Economics</option>
-                      <option>Mathematics</option>
-                      <option>Physics</option>
-                      <option>Biology</option>
-                      <option>Chemistry</option>
-                      <option>English Language</option>
-                      <option>English Literature</option>
-                      <option>Business Studies</option>
-                      <option>Accounting</option>
-                      <option>Computer Science</option>
-                      <option>Other</option>
-                    </select>
+                      list="careers-subjects-suggestions"
+                      placeholder="e.g. Economics, Mathematics, Physics, Chemistry..."
+                      className="font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3.5 text-on-background placeholder:text-muted focus:border-on-background focus:outline-none transition-colors"
+                    />
+                    <datalist id="careers-subjects-suggestions">
+                      <option value="Economics" />
+                      <option value="Mathematics" />
+                      <option value="Further Mathematics" />
+                      <option value="Physics" />
+                      <option value="Biology" />
+                      <option value="Chemistry" />
+                      <option value="English Language" />
+                      <option value="English Literature" />
+                      <option value="Business Studies" />
+                      <option value="Accounting" />
+                      <option value="Computer Science" />
+                      <option value="Psychology" />
+                      <option value="History" />
+                      <option value="Sociology" />
+                    </datalist>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
@@ -676,7 +728,7 @@ export default function CareersPage() {
                       <option>All of the above</option>
                     </select>
                   </div>
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5 sm:col-span-2">
                     <label className="font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant">
                       Years of Teaching Experience *
                     </label>
@@ -830,6 +882,7 @@ export default function CareersPage() {
                       </p>
                     )}
                   </div>
+
                   {/* Structured Weekly Availability */}
                   <div className="flex flex-col gap-4 sm:col-span-2 bg-[#fbf9f4] p-5 rounded-2xl border border-line">
                     <div className="flex items-center justify-between">
@@ -904,7 +957,78 @@ export default function CareersPage() {
                 </div>
               </div>
 
-              {/* Section 3: About You */}
+              {/* Section 3: Key Teaching Highlights & Methodology */}
+              <div className="bg-[#fbf9f4] p-5 sm:p-7 rounded-2xl border-2 border-line">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-line">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#c0392b]" />
+                    <h3 className="font-['Archivo_Black'] text-sm uppercase tracking-wider text-on-background">
+                      Key Teaching Highlights &amp; Methodology *
+                    </h3>
+                  </div>
+                  <span className="font-['IBM_Plex_Mono'] text-[11px] font-bold text-[#c0392b] bg-[#c0392b]/10 px-2 py-0.5 rounded-md">
+                    Minimum 3 required
+                  </span>
+                </div>
+
+                <p className="font-['Work_Sans'] text-xs text-on-surface-variant mb-4 leading-relaxed">
+                  Provide at least 3 concise bullet points highlighting your mark-scheme familiarity, student grade improvement records, exam-board mastery, or essay/numerical coaching frameworks.
+                </p>
+
+                <div className="flex flex-col gap-3">
+                  {formData.highlights.map((highlight, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5">
+                      <div className="w-8 h-11 rounded-xl bg-white border-2 border-line flex items-center justify-center shrink-0 text-[#c0392b] font-bold text-sm select-none mt-0.5">
+                        ✓
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={highlight}
+                          onChange={(e) => handleHighlightChange(idx, e.target.value)}
+                          placeholder={`e.g. ${
+                            idx === 0
+                              ? "Lesson plans built directly from official examiner reports and marking rubrics"
+                              : idx === 1
+                              ? "Specialist in 20-mark evaluation essay frameworks and data-response accuracy"
+                              : idx === 2
+                              ? "Over 6 years coaching top-grade students across CAIE, Edexcel, and AQA"
+                              : "Trained 15+ faculty members on Alinea's mark-scheme-first methodology"
+                          }`}
+                          className="w-full font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3 text-on-background placeholder:text-muted/60 focus:border-on-background focus:outline-none transition-colors"
+                        />
+                      </div>
+                      {formData.highlights.length > 3 && (
+                        <button
+                          type="button"
+                          onClick={() => removeHighlightField(idx)}
+                          className="h-11 w-11 rounded-xl border-2 border-line bg-white hover:bg-red-50 hover:border-red-300 text-on-surface-variant hover:text-red-600 flex items-center justify-center transition-colors shrink-0 cursor-pointer mt-0.5"
+                          title="Remove highlight"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={addHighlightField}
+                    className="inline-flex items-center gap-1.5 font-['Work_Sans'] font-bold text-xs text-on-surface-variant hover:text-on-background border border-dashed border-muted hover:border-on-background px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer bg-white"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Add Another Highlight</span>
+                  </button>
+
+                  <span className="font-['IBM_Plex_Mono'] text-[11px] text-muted">
+                    {formData.highlights.filter((h) => h.trim().length > 0).length} of {formData.highlights.length} filled (min 3)
+                  </span>
+                </div>
+              </div>
+
+              {/* Section 4: About You */}
               <div>
                 <h3 className="font-['Archivo_Black'] text-sm uppercase tracking-wider text-on-background mb-5 pb-2 border-b border-line">
                   About You
@@ -925,7 +1049,7 @@ export default function CareersPage() {
                 </div>
               </div>
 
-              {/* Section 4: File Uploads */}
+              {/* Section 5: File Uploads */}
               <div>
                 <h3 className="font-['Archivo_Black'] text-sm uppercase tracking-wider text-on-background mb-5 pb-2 border-b border-line">
                   Uploads
@@ -1044,3 +1168,5 @@ export default function CareersPage() {
     </div>
   );
 }
+
+
