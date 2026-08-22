@@ -1,246 +1,401 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
+import {
+  FileText,
+  Download,
+  Sparkles,
+  BookOpen,
+  ArrowRight,
+  ArrowDown,
+  Clock,
+  User,
+  GraduationCap,
+  Layers,
+  CheckCircle2,
+  Bookmark,
+  Award,
+} from "lucide-react";
+import { blogArticles, freeResources } from "@/data/blogData";
+
+export const metadata = {
+  title: "Examiner Blog & Free Study Resources | Alinea Online",
+  description:
+    "Explore high-yield examiner insights, 25-mark essay blueprints, and free downloadable revision vaults for CAIE, Edexcel, and AQA students.",
+};
 
 export default function BlogPage() {
-  const [subscribed, setSubscribed] = useState(false);
-  const [email, setEmail] = useState("");
-
-  const articles = [
-    {
-      id: 1,
-      title: "The 25-Mark Essay Blueprint: How to Secure Level 4 Evaluation",
-      category: "ECONOMICS A-LEVEL",
-      date: "August 2026",
-      readTime: "6 min read",
-      excerpt:
-        "Most A-Level Economics students lose marks not in theory, but in evaluation. Here is the exact paragraph structure senior examiners look for.",
-      author: "Khawar (Founder)",
-      featured: true,
-    },
-    {
-      id: 2,
-      title: "Why Past Paper Memorisation Fails in New Edexcel & CAIE Papers",
-      category: "EXAM TECHNIQUE",
-      date: "July 2026",
-      readTime: "4 min read",
-      excerpt:
-        "Exam boards frequently rewrite question triggers to penalize rote learning. Discover active application techniques.",
-      author: "Dr. Sarah Lin",
-      featured: false,
-    },
-    {
-      id: 3,
-      title: "Calculus & Mechanics Mistakes That Cost A* Student Grades",
-      category: "MATHEMATICS",
-      date: "July 2026",
-      readTime: "5 min read",
-      excerpt:
-        "Analysis of 500+ student papers reveals common algebraic slips and missing unit specifications in Edexcel Mechanics.",
-      author: "James Vance",
-      featured: false,
-    },
-    {
-      id: 4,
-      title: "The GCC Exam Survival Guide: Balancing School & Private Tutoring",
-      category: "STUDY STRATEGY",
-      date: "June 2026",
-      readTime: "7 min read",
-      excerpt:
-        "A structured timeline for Dubai and Riyadh students preparing for May/June and Oct/Nov exam series.",
-      author: "Khawar",
-      featured: false,
-    },
-  ];
-
-  const freeResources = [
-    {
-      title: "A-Level Economics Micro & Macro Model Diagram Pack (PDF)",
-      desc: "All 32 essential diagrams required for Edexcel & CAIE papers.",
-      format: "PDF (18 MB)",
-    },
-    {
-      title: "IGCSE Economics Mark Scheme Vocabulary Cheat Sheet",
-      desc: "Keyword clusters required for 4-mark and 6-mark data response questions.",
-      format: "PDF (4 MB)",
-    },
-    {
-      title: "Maths Formula & Trigonometric Proof Quick Reference",
-      desc: "High-yield formulas and proof templates for A-Level Pure Mathematics.",
-      format: "PDF (8 MB)",
-    },
-  ];
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email) setSubscribed(true);
-  };
+  const featuredArticle = blogArticles.find((a) => a.featured) || blogArticles[0];
+  const regularArticles = blogArticles.filter((a) => a.id !== featuredArticle.id);
 
   return (
-    <div className="w-full bg-background text-on-background">
-      {/* Header Banner */}
-      <section className="bg-on-background text-white py-16 px-6 border-b-4 border-primary-container">
+    <div className="w-full bg-[#faf8f2] text-on-background min-h-screen grain-bg">
+      {/* Hero Header */}
+      <section className="py-14 md:py-20 px-6 border-b-2 border-line bg-[#f5f2e9]/80 relative overflow-hidden">
         <div className="max-w-container-max mx-auto">
-          <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-            EXAM GUIDES & ACADEMIC INSIGHTS
-          </span>
-          <h1 className="font-['Archivo_Black'] text-4xl md:text-6xl text-primary-container mt-4 mb-4">
-            Blog & Exam Resources
-          </h1>
-          <p className="font-['Work_Sans'] text-lg text-surface-variant max-w-2xl leading-relaxed">
-            Free high-yield articles, mark scheme breakdowns, and downloadable revision guides written by senior examiners.
-          </p>
+          <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+            <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wider text-on-surface-variant flex items-center gap-2 mb-3">
+              <span className="w-5 h-0.5 bg-[#c0392b]"></span>
+              Examiner Insights &amp; Study Vault
+            </span>
+
+            <h1 className="font-['Archivo_Black'] text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-on-background leading-[1.1] mb-5 tracking-tight">
+              Academic Blog &amp;{" "}
+              <span className="relative inline-block text-on-background">
+                Free Resources
+                <svg
+                  className="absolute -bottom-1 left-0 w-full h-3 text-[#c0392b]"
+                  viewBox="0 0 100 12"
+                  fill="none"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M2 8 C 30 2, 70 10, 98 4"
+                    stroke="currentColor"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            </h1>
+
+            <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant leading-relaxed mb-8">
+              Explore mark-scheme breakdowns, essay evaluation blueprints, and
+              curated revision vaults reverse-engineered by senior examiners.
+            </p>
+
+            {/* Quick Section Jump Navigation */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+              <a
+                href="#articles"
+                className="bg-on-background text-white font-['Work_Sans'] font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full border-2 border-on-background shadow-[3px_3px_0_0_rgba(192,57,43,0.9)] hover:-translate-y-0.5 transition-transform inline-flex items-center gap-2"
+              >
+                <BookOpen className="w-4 h-4 text-primary-container" />
+                <span>Examiner Blog Articles</span>
+                <ArrowDown className="w-3.5 h-3.5 text-white/70" />
+              </a>
+
+              <a
+                href="#resources"
+                className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs sm:text-sm px-6 py-3.5 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform inline-flex items-center gap-2"
+              >
+                <Download className="w-4 h-4 text-[#c0392b]" />
+                <span>Free Revision Resources</span>
+                <ArrowDown className="w-3.5 h-3.5 text-on-background/70" />
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Main Content Section */}
-      <section className="py-16 px-6 max-w-container-max mx-auto">
-        {/* Featured Article */}
-        {articles.filter((a) => a.featured).map((article) => (
-          <div
-            key={article.id}
-            className="bg-primary-container text-on-background rounded-6 p-8 md:p-12 border-2 border-on-background neo-brutalist-shadow mb-16"
-          >
-            <div className="flex items-center gap-3 mb-4 font-['IBM_Plex_Mono'] text-xs font-bold">
-              <span className="bg-on-background text-primary-container px-3 py-1 rounded-full">
-                FEATURED ARTICLE
+      {/* SECTION 1: BLOG ARTICLES */}
+      <section
+        id="articles"
+        className="py-16 md:py-24 px-6 max-w-container-max mx-auto scroll-mt-10"
+      >
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4 border-b-2 border-line pb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-6 h-6 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-xs">
+                1
               </span>
-              <span>{article.category}</span>
-              <span>•</span>
-              <span>{article.readTime}</span>
+              <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant">
+                Examiner Guides &amp; Technique
+              </span>
+            </div>
+            <h2 className="font-['Archivo_Black'] text-2xl sm:text-3xl md:text-4xl text-on-background">
+              Featured Articles &amp; Insights
+            </h2>
+          </div>
+          <p className="font-['Work_Sans'] text-xs md:text-sm text-on-surface-variant max-w-md">
+            In-depth guides on syllabus command words, evaluation frameworks, and
+            common grade-costing mistakes.
+          </p>
+        </div>
+
+        {/* Featured Article Card */}
+        {featuredArticle && (
+          <div className="bg-primary-container text-on-background rounded-3xl p-7 md:p-12 border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] mb-14 transition-all">
+            <div className="flex flex-wrap items-center gap-2.5 mb-5">
+              <span className="inline-flex items-center gap-1.5 bg-on-background text-white font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-primary-container" />
+                Featured Guide
+              </span>
+              <span className="bg-white/80 border border-line font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full text-on-background">
+                {featuredArticle.category}
+              </span>
+              <span className="font-['IBM_Plex_Mono'] text-xs text-on-background/70 font-semibold">
+                {featuredArticle.boards}
+              </span>
             </div>
 
-            <h2 className="font-['Archivo_Black'] text-3xl md:text-5xl mb-4 leading-tight">
-              {article.title}
-            </h2>
-            <p className="font-['Work_Sans'] text-base md:text-lg text-on-primary-container max-w-3xl leading-relaxed mb-6">
-              {article.excerpt}
+            <h3 className="font-['Archivo_Black'] text-2xl sm:text-3xl md:text-4xl text-on-background mb-4 leading-tight">
+              {featuredArticle.title}
+            </h3>
+
+            <p className="font-['Work_Sans'] text-sm sm:text-base md:text-lg text-on-background/80 max-w-4xl leading-relaxed mb-6">
+              {featuredArticle.excerpt}
             </p>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-on-background/20">
-              <div className="font-['Work_Sans'] text-xs font-bold text-on-background">
-                By {article.author} | Published {article.date}
+            {/* Highlights bullets */}
+            {featuredArticle.highlights && (
+              <div className="bg-white/70 rounded-2xl p-5 md:p-6 border border-on-background/20 mb-8">
+                <p className="font-['IBM_Plex_Mono'] text-xs uppercase tracking-wider font-bold text-on-background mb-3 flex items-center gap-1.5">
+                  <Bookmark className="w-3.5 h-3.5 text-[#c0392b]" />
+                  What You&apos;ll Learn in This Guide:
+                </p>
+                <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {featuredArticle.highlights.map((h, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 font-['Work_Sans'] text-xs text-on-background"
+                    >
+                      <span className="text-[#c0392b] font-bold mt-0.5 shrink-0">
+                        ✓
+                      </span>
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            )}
+
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-on-background/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-on-background text-white flex items-center justify-center font-bold text-sm font-['IBM_Plex_Mono']">
+                  {featuredArticle.author.charAt(0)}
+                </div>
+                <div>
+                  <span className="font-['Work_Sans'] font-bold text-sm text-on-background block">
+                    {featuredArticle.author}
+                  </span>
+                  <span className="font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
+                    {featuredArticle.authorRole} • {featuredArticle.readTime}
+                  </span>
+                </div>
+              </div>
+
               <Link
-                href="/booking"
-                className="bg-on-background text-white font-['Work_Sans'] font-bold text-sm px-6 py-3 rounded-full border border-white hover:bg-inverse-surface transition-colors"
+                href={`/booking?subject=Economics`}
+                className="bg-on-background text-white font-['Work_Sans'] font-extrabold text-xs sm:text-sm px-7 py-3.5 rounded-full border border-on-background hover:bg-[#c0392b] hover:border-[#c0392b] transition-colors inline-flex items-center gap-2"
               >
-                Read Full Guide
+                <span>Book 1:1 Consultation</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
-        ))}
+        )}
 
-        {/* Article Grid */}
-        <h3 className="font-['Archivo_Black'] text-2xl text-on-background mb-8">
-          Recent Exam Guides
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {articles
-            .filter((a) => !a.featured)
-            .map((art) => (
-              <div
-                key={art.id}
-                className="bg-white rounded-5 p-6 border-2 border-on-background bento-shadow flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3 font-['IBM_Plex_Mono'] text-2.75 text-secondary">
-                    <span className="font-bold text-primary">{art.category}</span>
-                    <span>{art.readTime}</span>
+        {/* Regular Articles Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+          {regularArticles.map((article) => (
+            <div
+              key={article.id}
+              className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-line hover:border-on-background hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-on-background)] transition-transform duration-200 flex flex-col justify-between"
+            >
+              <div>
+                {/* Meta Header */}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className="font-['IBM_Plex_Mono'] text-[11px] font-bold text-[#c0392b] bg-[#c0392b]/10 px-2.5 py-0.5 rounded-md uppercase">
+                    {article.category}
+                  </span>
+                  <span className="font-['IBM_Plex_Mono'] text-[11px] text-muted flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {article.readTime}
+                  </span>
+                </div>
+
+                <span className="font-['IBM_Plex_Mono'] text-[10px] text-muted block mb-2 font-medium">
+                  Boards: {article.boards}
+                </span>
+
+                <h3 className="font-['Archivo_Black'] text-lg text-on-background mb-3 leading-snug">
+                  {article.title}
+                </h3>
+
+                <p className="font-['Work_Sans'] text-xs sm:text-sm text-on-surface-variant leading-relaxed mb-4">
+                  {article.excerpt}
+                </p>
+
+                {/* Key Takeaways */}
+                {article.highlights && (
+                  <div className="bg-[#f5f2e9]/70 rounded-xl p-3.5 border border-line mb-5">
+                    <ul className="flex flex-col gap-1.5">
+                      {article.highlights.map((h, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 font-['Work_Sans'] text-[11px] text-on-background"
+                        >
+                          <span className="text-[#c0392b] font-bold shrink-0">
+                            ✓
+                          </span>
+                          <span className="line-clamp-1">{h}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <h4 className="font-['Archivo_Black'] text-lg text-on-background mb-3 leading-snug">
-                    {art.title}
-                  </h4>
-                  <p className="font-['Work_Sans'] text-xs text-on-surface-variant leading-relaxed mb-4">
-                    {art.excerpt}
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-line flex items-center justify-between text-xs">
-                  <span className="font-['Work_Sans'] font-semibold text-secondary">{art.author}</span>
-                  <Link href="/booking" className="font-bold text-primary hover:underline">
-                    Read Article →
-                  </Link>
-                </div>
+                )}
               </div>
-            ))}
-        </div>
 
-        {/* Free Resource Downloads */}
-        <div className="bg-on-background text-white rounded-6 p-8 md:p-12 border-2 border-on-background shadow-lg mb-16">
-          <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-            FREE DOWNLOADS
-          </span>
-          <h2 className="font-['Archivo_Black'] text-3xl md:text-4xl text-primary-container mt-3 mb-6">
-            Revision Cheat Sheets & Model Packs
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {freeResources.map((res, i) => (
-              <div
-                key={i}
-                className="bg-inverse-surface p-6 rounded-xl border border-outline flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="material-symbols-outlined text-2xl text-primary-container">
-                      download
-                    </span>
-                    <span className="font-['IBM_Plex_Mono'] text-2.5 text-muted">
-                      {res.format}
-                    </span>
-                  </div>
-                  <h4 className="font-['Archivo_Black'] text-base text-white mb-2">
-                    {res.title}
-                  </h4>
-                  <p className="font-['Work_Sans'] text-xs text-surface-dim leading-relaxed mb-4">
-                    {res.desc}
-                  </p>
+              {/* Author & Footer Link */}
+              <div className="pt-4 border-t border-line/60 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <User className="w-3.5 h-3.5 text-muted" />
+                  <span className="font-['Work_Sans'] text-xs font-bold text-on-background truncate max-w-[120px]">
+                    {article.author}
+                  </span>
                 </div>
 
                 <Link
                   href="/booking"
-                  className="w-full text-center bg-primary-container text-on-primary-container font-['Work_Sans'] font-extrabold text-xs py-2.5 rounded-lg border border-white"
+                  className="font-['Work_Sans'] font-extrabold text-xs text-[#c0392b] hover:text-on-background inline-flex items-center gap-1 transition-colors"
                 >
-                  Download Guide
+                  <span>Book Consultation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 2: FREE REVISION RESOURCES */}
+      <section
+        id="resources"
+        className="py-16 md:py-24 px-6 border-t-2 border-line bg-[#f5f2e9]/60 scroll-mt-10"
+      >
+        <div className="max-w-container-max mx-auto">
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4 border-b-2 border-line pb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-6 h-6 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-xs">
+                  2
+                </span>
+                <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant">
+                  Downloadable Study Vault
+                </span>
+              </div>
+              <h2 className="font-['Archivo_Black'] text-2xl sm:text-3xl md:text-4xl text-on-background">
+                Free Revision Packs &amp; Cheat Sheets
+              </h2>
+            </div>
+            <p className="font-['Work_Sans'] text-xs md:text-sm text-on-surface-variant max-w-md">
+              High-yield diagram masterpacks, formula vaults, and examiner mark
+              scheme cheat sheets prepared for self-study and revision.
+            </p>
+          </div>
+
+          {/* Resources Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+            {freeResources.map((resource) => (
+              <div
+                key={resource.id}
+                className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-line neo-brutalist-shadow flex flex-col justify-between group hover:border-on-background transition-colors"
+              >
+                <div>
+                  {/* Top Badges */}
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span className="font-['IBM_Plex_Mono'] text-[10px] font-bold px-2.5 py-1 rounded-full bg-primary-container text-on-background border border-on-background/20 uppercase tracking-wider">
+                      {resource.badge}
+                    </span>
+                    <span className="font-['IBM_Plex_Mono'] text-[11px] text-muted font-medium">
+                      {resource.fileSize}
+                    </span>
+                  </div>
+
+                  {/* Subject & Boards */}
+                  <div className="flex items-center gap-2 mb-2 font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
+                    <span className="font-bold text-[#c0392b]">
+                      {resource.subject}
+                    </span>
+                    <span>•</span>
+                    <span className="truncate">{resource.boards}</span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="font-['Archivo_Black'] text-lg sm:text-xl text-on-background mb-3 leading-snug">
+                    {resource.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="font-['Work_Sans'] text-xs sm:text-sm text-on-surface-variant leading-relaxed mb-5">
+                    {resource.desc}
+                  </p>
+
+                  {/* Included Topics Box */}
+                  <div className="bg-[#fbf9f4] rounded-2xl p-4 border border-line mb-6">
+                    <p className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider font-bold text-on-surface-variant mb-2.5 flex items-center gap-1.5">
+                      <Layers className="w-3 h-3 text-[#c0392b]" />
+                      Included in this pack:
+                    </p>
+                    <ul className="flex flex-col gap-2">
+                      {resource.includedTopics.map((topic, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 font-['Work_Sans'] text-xs text-on-background"
+                        >
+                          <span className="text-[#c0392b] font-bold shrink-0 mt-0.5">
+                            ✓
+                          </span>
+                          <span className="leading-tight">{topic}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Resource Card Footer */}
+                <div className="pt-4 border-t border-line/60 flex flex-col gap-3">
+                  <div className="flex items-center justify-between text-[11px] font-['IBM_Plex_Mono'] text-muted">
+                    <span>{resource.format}</span>
+                    <span className="text-emerald-700 font-semibold">
+                      {resource.downloadsCount}
+                    </span>
+                  </div>
+
+                  <Link
+                    href={`/pricing`}
+                    className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs sm:text-sm py-3.5 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform flex items-center justify-center gap-2 text-center"
+                  >
+                    <Download className="w-4 h-4 text-on-background" />
+                    <span>Get Access via Diagnostic Pack</span>
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Newsletter Subscription */}
-        <div className="bg-surface-container rounded-6 p-8 md:p-12 border-2 border-on-background text-center max-w-3xl mx-auto bento-shadow">
-          <h3 className="font-['Archivo_Black'] text-2xl text-on-background mb-3">
-            Get Examiner Tips Delivered Weekly
-          </h3>
-          <p className="font-['Work_Sans'] text-sm text-on-surface-variant mb-6">
-            Join 1,200+ students and parents receiving weekly mark scheme breakdowns and exam timetable strategies.
-          </p>
-
-          {subscribed ? (
-            <div className="bg-success text-white p-4 rounded-full font-['Work_Sans'] font-bold text-sm">
-              ✓ Subscribed! You will receive our next examiner newsletter.
+          {/* Special Resources Banner */}
+          <div className="mt-14 bg-on-background text-white rounded-3xl border-2 border-on-background p-8 md:p-12 shadow-xl">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-8 flex flex-col gap-3">
+                <span className="font-['IBM_Plex_Mono'] text-xs font-bold text-primary-container uppercase tracking-wider flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  All-Inclusive Syllabus Repositories
+                </span>
+                <h3 className="font-['Archivo_Black'] text-2xl sm:text-3xl md:text-4xl text-white leading-tight">
+                  Need Personalized Past Paper Marking &amp; Feedback?
+                </h3>
+                <p className="font-['Work_Sans'] text-sm sm:text-base text-surface-variant max-w-2xl leading-relaxed">
+                  Our examiner tutors provide line-by-line mark scheme audits on
+                  your mock essays, calculations, and data response questions.
+                </p>
+              </div>
+              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
+                <Link
+                  href="/pricing"
+                  className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-sm px-8 py-4 rounded-full border-2 border-white neo-brutalist-shadow hover:-translate-y-0.5 transition-transform text-center"
+                >
+                  Explore Tutoring Plans
+                </Link>
+                <Link
+                  href="/faculty"
+                  className="bg-transparent text-white font-['Work_Sans'] font-bold text-sm px-8 py-4 rounded-full border-2 border-white hover:bg-white/10 transition-colors text-center"
+                >
+                  Meet Faculty Specialists
+                </Link>
+              </div>
             </div>
-          ) : (
-            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="flex-1 p-3.5 bg-white border border-on-background rounded-full text-sm font-['Work_Sans']"
-              />
-              <button
-                type="submit"
-                className="bg-primary-container text-on-primary-container font-['Work_Sans'] font-extrabold text-sm px-6 py-3.5 rounded-full border border-on-background neo-brutalist-shadow whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
-          )}
+          </div>
         </div>
       </section>
     </div>
