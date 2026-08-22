@@ -11,8 +11,6 @@ import {
 } from "lucide-react";
 import { packages, countries } from "@/data/pricingData";
 import { subjectsData } from "@/data/subjectsData";
-import { db } from "@/config/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
 
 export default function PricingPage() {
@@ -35,6 +33,7 @@ export default function PricingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [whatsappRedirectUrl, setWhatsappRedirectUrl] = useState("");
 
   const selectedCountry = useMemo(
     () => countries.find((c) => c.code === selectedCountryCode) || countries[0],
@@ -81,44 +80,51 @@ export default function PricingPage() {
   );
   const availableBoards = selectedLevelData?.boards || [];
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError("");
 
-    try {
-      const pkg = packages.find((p) => p.id === selectedPackageId);
-      const totalEstimatedPrice = pkg.basePrice * selectedCountry.rate;
+    const pkg = packages.find((p) => p.id === selectedPackageId) || packages[0];
+    const formattedPriceStr = formatPrice(pkg.basePrice);
 
-      await addDoc(collection(db, "booking_requests"), {
-        studentName: formData.studentName,
-        parentName: formData.parentName,
-        email: formData.email,
-        phone: formData.phone,
-        subjectId: formData.subjectId,
-        levelId: formData.levelId,
-        boardId: formData.boardId,
-        preferredDays: formData.preferredDays,
-        preferredTime: formData.preferredTime,
-        countryCode: selectedCountryCode,
-        countryName: selectedCountry.name,
-        timezone: selectedCountry.timezone,
-        packageId: selectedPackageId,
-        packageName: pkg.title,
-        estimatedTotal: `${selectedCountry.symbol} ${totalEstimatedPrice}`,
-        status: "pending_payment", // Placeholder for future Stripe integration
-        createdAt: serverTimestamp(),
-      });
+    const subjectTitle = selectedSubjectData?.title || formData.subjectId || "Not specified";
+    const levelTitle = selectedLevelData?.label || formData.levelId || "Not specified";
+    const selectedBoardData = availableBoards.find((b) => b.id === formData.boardId);
+    const boardTitle = selectedBoardData?.label
+      ? `${selectedBoardData.label}${selectedBoardData.syllabus ? ` (${selectedBoardData.syllabus})` : ""}`
+      : formData.boardId || "Not specified";
 
-      setIsSubmitted(true);
-    } catch (err) {
-      console.error("Booking submission error:", err);
-      setSubmitError(
-        "Failed to submit booking request. Please check your connection and try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Construct WhatsApp message with all details and selected options
+    const whatsappMessage = `*New Booking Request - Alinea Online*
+
+*Student Details:*
+• *Student Name:* ${formData.studentName}
+• *Parent Name:* ${formData.parentName}
+• *Email:* ${formData.email}
+• *Phone:* ${formData.phone}
+
+*Package & Pricing:*
+• *Package:* ${pkg.title} (${pkg.sessions} Session${pkg.sessions > 1 ? "s" : ""})
+• *Estimated Fee:* ${formattedPriceStr}
+• *Region:* ${selectedCountry.name} (${selectedCountry.timezone})
+
+*Academic Focus:*
+• *Subject:* ${subjectTitle}
+• *Level:* ${levelTitle}
+• *Exam Board:* ${boardTitle}
+
+*Scheduling Preferences:*
+• *Preferred Days:* ${formData.preferredDays}
+• *Preferred Time:* ${formData.preferredTime} (${selectedCountry.timezone})`;
+
+    const waUrl = `https://wa.me/923322348565?text=${encodeURIComponent(whatsappMessage)}`;
+    setWhatsappRedirectUrl(waUrl);
+
+    // Open WhatsApp directly
+    window.open(waUrl, "_blank");
+    setIsSubmitted(true);
+    setIsSubmitting(false);
   };
 
   if (isSubmitted) {
@@ -131,18 +137,35 @@ export default function PricingPage() {
           <h1 className="font-['Archivo_Black'] text-3xl md:text-4xl text-on-background mb-4">
             Booking Request Received!
           </h1>
-          <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant leading-relaxed mb-8">
-            Thank you for choosing Alinea Online. Our academic team will review
-            your requested slots and contact you shortly to confirm the schedule
-            and arrange payment.
+          <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant leading-relaxed mb-6">
+            Thank you for choosing Alinea Online. We are redirecting you to our
+            academic team on WhatsApp to confirm your schedule and finalize your
+            booking.
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 font-['Work_Sans'] font-extrabold text-sm border-b-2 border-on-background pb-1 hover:text-[#c0392b] hover:border-[#c0392b] transition-colors"
-          >
-            <ArrowRight className="w-4 h-4" />
-            Return to Home
-          </Link>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            {whatsappRedirectUrl && (
+              <a
+                href={whatsappRedirectUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#25D366] text-white font-['Work_Sans'] font-extrabold text-sm px-8 py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                <span>Continue to WhatsApp</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            )}
+            <Link
+              href="/"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent text-on-background font-['Work_Sans'] font-extrabold text-sm px-8 py-4 rounded-full border-2 border-on-background hover:bg-[#faf8f2] transition-colors"
+            >
+              Return to Home
+            </Link>
+          </div>
+
+          <p className="font-['IBM_Plex_Mono'] text-xs text-muted">
+            Direct WhatsApp: +92 332 2348565
+          </p>
         </div>
       </div>
     );
