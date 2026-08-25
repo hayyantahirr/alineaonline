@@ -1,13 +1,13 @@
 "use client";
 
 export default function LevelBoardTabs({
-  levels,
+  levels = [],
   activeLevel,
   activeBoard,
   onSelectLevel,
   onSelectBoard,
 }) {
-  const currentLevel = levels.find((l) => l.id === activeLevel);
+  const currentLevel = (levels || []).find((l) => l.id === activeLevel) || levels[0];
   const boards = currentLevel?.boards || [];
 
   return (

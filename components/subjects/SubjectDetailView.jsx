@@ -14,8 +14,15 @@ export default function SubjectDetailView({
 }) {
   if (!subject) return null;
 
-  const currentLevel = subject.levels.find((l) => l.id === activeLevel);
-  const currentBoard = currentLevel?.boards.find((b) => b.id === activeBoard);
+  const currentLevel =
+    (subject.levels || []).find((l) => l.id === activeLevel) ||
+    subject.levels?.[0];
+  const currentBoard =
+    (currentLevel?.boards || []).find((b) => b.id === activeBoard) ||
+    currentLevel?.boards?.[0];
+
+  const tutorName = subject.tutor || "Lead Specialist";
+  const tutorFirstName = tutorName.split(" ")[0] || "Specialist";
 
   return (
     <div className="flex-1 min-w-0">
@@ -51,32 +58,34 @@ export default function SubjectDetailView({
               Lead Specialist:
             </span>
             <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
-              {subject.tutor}
+              {tutorName}
             </span>
           </div>
           <Link
             href={`/booking?teacher=${encodeURIComponent(
-              subject.tutor,
+              tutorName
             )}&subject=${encodeURIComponent(
-              subject.bookingParam || subject.title,
+              subject.bookingParam || subject.title
             )}`}
             className="font-['Work_Sans'] text-xs font-bold text-on-background bg-primary-container px-4 py-1.5 rounded-full border border-on-background hover:bg-on-background hover:text-primary-container transition-colors"
           >
-            Book Session with {subject.tutor.split(" ")[0]}
+            Book Session with {tutorFirstName}
           </Link>
         </div>
       </div>
 
       {/* Level & Board Tabs */}
-      <div className="bg-white/80 rounded-2xl p-5 md:p-6 border-2 border-line mb-6">
-        <LevelBoardTabs
-          levels={subject.levels}
-          activeLevel={activeLevel}
-          activeBoard={activeBoard}
-          onSelectLevel={onSelectLevel}
-          onSelectBoard={onSelectBoard}
-        />
-      </div>
+      {(subject.levels || []).length > 0 && (
+        <div className="bg-white/80 rounded-2xl p-5 md:p-6 border-2 border-line mb-6">
+          <LevelBoardTabs
+            levels={subject.levels}
+            activeLevel={activeLevel || currentLevel?.id}
+            activeBoard={activeBoard || currentBoard?.id}
+            onSelectLevel={onSelectLevel}
+            onSelectBoard={onSelectBoard}
+          />
+        </div>
+      )}
 
       {/* Active Board Label */}
       {currentBoard && (

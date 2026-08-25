@@ -15,54 +15,6 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
-import { subjectsData } from "@/data/subjectsData";
-import { facultyMembers } from "@/data/facultyData";
-
-// Helper to find teacher from URL param or name
-const findTeacherByParam = (param) => {
-  if (!param) return null;
-  const lower = param.toLowerCase();
-  return facultyMembers.find(
-    (t) =>
-      t.name.toLowerCase().includes(lower) ||
-      lower.includes(t.name.toLowerCase()) ||
-      t.id === lower,
-  );
-};
-
-// Helper to find subject from URL param or name
-const findSubjectByParam = (param) => {
-  if (!param) return subjectsData[0];
-  const lower = param.toLowerCase();
-  return (
-    subjectsData.find(
-      (s) =>
-        s.id.toLowerCase() === lower ||
-        s.title.toLowerCase().includes(lower) ||
-        lower.includes(s.title.toLowerCase()),
-    ) || subjectsData[0]
-  );
-};
-
-// Helper to find lead teacher for a given subject
-const getLeadTeacherForSubject = (subjectObj) => {
-  if (!subjectObj) return facultyMembers[0];
-  const leadNameFirstWord = subjectObj.tutor
-    ? subjectObj.tutor.split(" ")[0].toLowerCase()
-    : "";
-  const found = facultyMembers.find(
-    (f) =>
-      f.name.toLowerCase().includes(leadNameFirstWord) ||
-      f.subject
-        .toLowerCase()
-        .includes(subjectObj.title.toLowerCase().split(" ")[0]) ||
-      (f.subjectBookingParam &&
-        subjectObj.title
-          .toLowerCase()
-          .includes(f.subjectBookingParam.toLowerCase())),
-  );
-  return found || facultyMembers[0];
-};
 
 function BookingContent() {
   const searchParams = useSearchParams();
@@ -70,33 +22,14 @@ function BookingContent() {
   const subjectParam = searchParams.get("subject");
   const levelParam = searchParams.get("level");
 
-  // Initial State derived dynamically from parameters or defaults
-  const [selectedSubject, setSelectedSubject] = useState(() =>
-    findSubjectByParam(subjectParam),
-  );
-  const [selectedTeacher, setSelectedTeacher] = useState(() => {
-    const fromTeacherParam = findTeacherByParam(teacherParam);
-    if (fromTeacherParam) return fromTeacherParam;
-    const initialSub = findSubjectByParam(subjectParam);
-    return getLeadTeacherForSubject(initialSub);
-  });
+  const [teachers, setTeachers] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Current Level Object (derived from selectedSubject)
-  const currentLevels = selectedSubject.levels || [];
-  const [selectedLevelLabel, setSelectedLevelLabel] = useState(
-    () => levelParam || currentLevels[0]?.label || "A-Level",
-  );
-
-  // Active level object derived
-  const activeLevelObj =
-    currentLevels.find((l) => l.label === selectedLevelLabel) ||
-    currentLevels[0] || { boards: [] };
-
-  // Current Boards for active level
-  const currentBoards = activeLevelObj.boards || [];
-  const [selectedBoardLabel, setSelectedBoardLabel] = useState(
-    () => currentBoards[0]?.label || "Edexcel (Pearson)",
-  );
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedLevelLabel, setSelectedLevelLabel] = useState(levelParam || "A-Level");
+  const [selectedBoardLabel, setSelectedBoardLabel] = useState("Edexcel (Pearson)");
 
   const [selectedFormat, setSelectedFormat] = useState(
     "1:1 Intensive Mentorship",
@@ -118,31 +51,109 @@ function BookingContent() {
     additionalNotes: "",
   });
 
-  // Synchronize URL search params if they change dynamically
+  // Fetch subjects and teachers from APIs
   useEffect(() => {
-    if (teacherParam) {
-      const t = findTeacherByParam(teacherParam);
-      if (t) {
-        setSelectedTeacher(t);
-        // Find subject matching teacher
-        const matchingSub = subjectsData.find(
-          (s) =>
-            s.title
-              .toLowerCase()
-              .includes(t.subjectBookingParam?.toLowerCase() || "") ||
-            t.subject
-              .toLowerCase()
-              .includes(s.title.toLowerCase().split(" ")[0]),
-        );
-        if (matchingSub) setSelectedSubject(matchingSub);
+    let isMounted = true;
+
+    async function loadData() {
+      try {
+        setLoading(true);
+        const [teachersRes, subjectsRes] = await Promise.all([
+          fetch("/api/teachers"),
+          fetch("/api/subjects"),
+        ]);
+
+        const teachersData = await teachersRes.json();
+        const subjectsData = await subjectsRes.json();
+
+        if (isMounted) {
+          const loadedTeachers = teachersData.success && Array.isArray(teachersData.teachers)
+            ? teachersData.teachers
+            : [];
+          const loadedSubjects = subjectsData.success && Array.isArray(subjectsData.subjects)
+            ? subjectsData.subjects
+            : [];
+
+          setTeachers(loadedTeachers);
+          setSubjects(loadedSubjects);
+
+          // Find teacher by param or default
+          let resolvedTeacher = null;
+          if (teacherParam) {
+            const lower = teacherParam.toLowerCase();
+            resolvedTeacher = loadedTeachers.find(
+              (t) =>
+                t.name?.toLowerCase().includes(lower) ||
+                lower.includes(t.name?.toLowerCase() || "") ||
+                t.id === lower,
+            );
+          }
+
+          // Find subject by param, or by teacher, or default to first
+          let resolvedSubject = null;
+          if (subjectParam) {
+            const lower = subjectParam.toLowerCase();
+            resolvedSubject = loadedSubjects.find(
+              (s) =>
+                s.id?.toLowerCase() === lower ||
+                s.title?.toLowerCase().includes(lower) ||
+                lower.includes(s.title?.toLowerCase() || ""),
+            );
+          } else if (resolvedTeacher) {
+            resolvedSubject = loadedSubjects.find(
+              (s) =>
+                s.title
+                  ?.toLowerCase()
+                  .includes(resolvedTeacher.subjectBookingParam?.toLowerCase() || "") ||
+                resolvedTeacher.subject
+                  ?.toLowerCase()
+                  .includes(s.title?.toLowerCase().split(" ")[0] || ""),
+            );
+          }
+
+          if (!resolvedSubject && loadedSubjects.length > 0) {
+            resolvedSubject = loadedSubjects[0];
+          }
+
+          if (!resolvedTeacher && loadedTeachers.length > 0) {
+            resolvedTeacher = loadedTeachers[0];
+          }
+
+          setSelectedSubject(resolvedSubject);
+          setSelectedTeacher(resolvedTeacher);
+
+          if (resolvedSubject?.levels?.length > 0) {
+            const firstLevel = resolvedSubject.levels[0];
+            setSelectedLevelLabel(levelParam || firstLevel.label);
+            if (firstLevel.boards?.length > 0) {
+              setSelectedBoardLabel(firstLevel.boards[0].label);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Booking data fetch error:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } else if (subjectParam) {
-      const s = findSubjectByParam(subjectParam);
-      setSelectedSubject(s);
-      const lead = getLeadTeacherForSubject(s);
-      setSelectedTeacher(lead);
     }
-  }, [teacherParam, subjectParam]);
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [teacherParam, subjectParam, levelParam]);
+
+  // Current Level Object (derived from selectedSubject)
+  const currentLevels = selectedSubject?.levels || [];
+  const activeLevelObj =
+    currentLevels.find((l) => l.label === selectedLevelLabel) ||
+    currentLevels[0] || { boards: [] };
+
+  // Current Boards for active level
+  const currentBoards = activeLevelObj.boards || [];
 
   // Keep Level and Board valid when Subject changes
   useEffect(() => {
@@ -165,23 +176,28 @@ function BookingContent() {
   // Handler when user selects a Subject button
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
-    const leadTeacher = getLeadTeacherForSubject(subject);
-    setSelectedTeacher(leadTeacher);
+    const leadTeacher = teachers.find(
+      (f) =>
+        f.subject?.toLowerCase().includes(subject.title?.toLowerCase().split(" ")[0] || "") ||
+        (f.subjectBookingParam &&
+          subject.title?.toLowerCase().includes(f.subjectBookingParam.toLowerCase())),
+    ) || teachers[0];
+    if (leadTeacher) setSelectedTeacher(leadTeacher);
   };
 
   // Handler when user selects a Teacher dropdown
   const handleSelectTeacher = (teacherId) => {
-    const t = facultyMembers.find((f) => f.id === teacherId);
+    const t = teachers.find((f) => f.id === teacherId);
     if (!t) return;
     setSelectedTeacher(t);
 
     // Auto-select corresponding subject if available
-    const matchingSub = subjectsData.find(
+    const matchingSub = subjects.find(
       (s) =>
         s.title
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(t.subjectBookingParam?.toLowerCase() || "") ||
-        t.subject.toLowerCase().includes(s.title.toLowerCase().split(" ")[0]),
+        t.subject?.toLowerCase().includes(s.title?.toLowerCase().split(" ")[0] || ""),
     );
     if (matchingSub) {
       setSelectedSubject(matchingSub);
@@ -200,7 +216,7 @@ function BookingContent() {
         studentName: formData.studentName,
         email: formData.email,
         phone: formData.phone,
-        subject: selectedSubject.title,
+        subject: selectedSubject?.title || "Subject",
         level: selectedLevelLabel,
         examBoard: selectedBoardLabel,
         teacherName: selectedTeacher?.name || "Unassigned Specialist",
@@ -239,7 +255,7 @@ function BookingContent() {
   );
 
   return (
-    <div className="w-full bg-[#faf8f2] text-on-background grain-bg min-h-screen">
+    <div className="w-full bg-[#faf8f2] text-on-background min-h-screen">
       {/* Header */}
       <section className="bg-on-background text-white py-14 px-6 border-b-4 border-primary-container">
         <div className="max-w-container-max mx-auto text-center">
@@ -249,7 +265,9 @@ function BookingContent() {
           <h1 className="font-['Archivo_Black'] text-3xl md:text-5xl text-primary-container mt-4 mb-3">
             {selectedTeacher
               ? `Book a Session with ${selectedTeacher.name}`
-              : `Book Your ${selectedSubject.title} Consultation`}
+              : selectedSubject
+              ? `Book Your ${selectedSubject.title} Consultation`
+              : "Book Your Academic Consultation"}
           </h1>
           <p className="font-['Work_Sans'] text-base md:text-lg text-surface-variant max-w-2xl mx-auto leading-relaxed">
             Select your target subject, preferred examiner specialist, and time
@@ -261,7 +279,11 @@ function BookingContent() {
 
       {/* Main Booking Container */}
       <section className="py-12 md:py-18 px-6 max-w-container-max mx-auto">
-        {isSubmitted ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-[#c0392b]" />
+          </div>
+        ) : isSubmitted ? (
           <div className="bg-primary-container text-on-background p-8 md:p-14 rounded-3xl border-2 border-on-background neo-brutalist-shadow text-center max-w-2xl mx-auto">
             <div className="w-16 h-16 bg-on-background text-primary-container rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-8 h-8 text-primary-container" />
@@ -274,7 +296,7 @@ function BookingContent() {
               senior academic coordinator will reach out to you via WhatsApp /
               email within <strong>2 hours</strong> to confirm your{" "}
               <strong>
-                {selectedSubject.title} ({selectedLevelLabel})
+                {selectedSubject?.title} ({selectedLevelLabel})
               </strong>{" "}
               session slot with <strong>{selectedTeacher?.name}</strong>.
             </p>
@@ -290,7 +312,7 @@ function BookingContent() {
                 {activeBoardObj?.syllabus ? `(${activeBoardObj.syllabus})` : ""}
               </p>
               <p className="text-muted pt-1">
-               No payment is required today.
+                No payment is required today.
               </p>
             </div>
 
@@ -328,13 +350,19 @@ function BookingContent() {
               {selectedTeacher && (
                 <div className="bg-[#f5f2e9] border-2 border-on-background rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-on-background shrink-0 relative">
-                      <Image
-                        src={selectedTeacher.image}
-                        alt={selectedTeacher.name}
-                        fill
-                        className="object-cover"
-                      />
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-on-background shrink-0 relative bg-surface-container-low">
+                      {selectedTeacher.image ? (
+                        <Image
+                          src={selectedTeacher.image}
+                          alt={selectedTeacher.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-primary-container font-['Archivo_Black'] bg-[#191c1d]">
+                          {selectedTeacher.name?.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
@@ -348,231 +376,245 @@ function BookingContent() {
                               : "bg-amber-50 text-amber-800 border-amber-300"
                           }`}
                         >
-                          ● {selectedTeacher.availability}
+                          ● {selectedTeacher.availability || "Accepting Students"}
                         </span>
                       </div>
                       <h4 className="font-['Archivo_Black'] text-lg text-on-background flex items-center gap-2">
                         {selectedTeacher.name}
-                        <span className="font-['Work_Sans'] text-xs font-normal text-on-surface-variant">
-                          ({selectedTeacher.qualification})
-                        </span>
+                        {selectedTeacher.qualification && (
+                          <span className="font-['Work_Sans'] text-xs font-normal text-on-surface-variant">
+                            ({selectedTeacher.qualification})
+                          </span>
+                        )}
                       </h4>
                       <p className="font-['Work_Sans'] text-xs text-on-surface-variant">
-                        {selectedTeacher.role} · {selectedTeacher.experience}{" "}
-                        Exp.
+                        {selectedTeacher.role} {selectedTeacher.experience ? `· ${selectedTeacher.experience} Exp.` : ""}
                       </p>
                     </div>
                   </div>
 
                   {/* Change Teacher Dropdown */}
-                  <div className="w-full sm:w-auto">
-                    <label className="block font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-on-surface-variant mb-1">
-                      Switch Specialist:
-                    </label>
-                    <select
-                      value={selectedTeacher.id}
-                      onChange={(e) => handleSelectTeacher(e.target.value)}
-                      className="w-full sm:w-auto p-2 bg-white border border-on-background rounded-xl font-['Work_Sans'] text-xs font-bold focus:outline-none cursor-pointer"
-                    >
-                      {facultyMembers.map((fac) => (
-                        <option key={fac.id} value={fac.id}>
-                          {fac.name} ({fac.subject.split(" ")[0]})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {teachers.length > 0 && (
+                    <div className="w-full sm:w-auto">
+                      <label className="block font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-on-surface-variant mb-1">
+                        Switch Specialist:
+                      </label>
+                      <select
+                        value={selectedTeacher.id}
+                        onChange={(e) => handleSelectTeacher(e.target.value)}
+                        className="w-full sm:w-auto p-2 bg-white border border-on-background rounded-xl font-['Work_Sans'] text-xs font-bold focus:outline-none cursor-pointer"
+                      >
+                        {teachers.map((fac) => (
+                          <option key={fac.id} value={fac.id}>
+                            {fac.name} ({fac.subject?.split(" ")[0] || "Specialist"})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Step 1: Target Subject Selection (Dynamic from subjectsData) */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="font-['Archivo_Black'] text-lg text-on-background">
-                      1. Select Target Subject
-                    </label>
-                    <span className="font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
-                      {subjectsData.length} Subjects Available
-                    </span>
+                {/* Step 1: Target Subject Selection */}
+                {subjects.length > 0 && selectedSubject && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="font-['Archivo_Black'] text-lg text-on-background">
+                        1. Select Target Subject
+                      </label>
+                      <span className="font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
+                        {subjects.length} Subjects Available
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                      {subjects.map((sub) => {
+                        const isSelected = selectedSubject.id === sub.id;
+
+                        return (
+                          <button
+                            type="button"
+                            key={sub.id}
+                            onClick={() => handleSelectSubject(sub)}
+                            className={`p-3.5 rounded-xl border-2 font-['Work_Sans'] font-bold text-xs md:text-sm text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                              isSelected
+                                ? "bg-primary-container border-on-background text-on-background neo-brutalist-shadow"
+                                : "bg-background border-line text-on-surface-variant hover:bg-surface-container hover:border-on-background/40"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-['IBM_Plex_Mono'] text-[10px] font-bold text-[#c0392b]">
+                                {sub.num}
+                              </span>
+                              {sub.badgeType === "red-outline" && (
+                                <span className="font-['IBM_Plex_Mono'] text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#c0392b] text-[#c0392b]">
+                                  {sub.tag}
+                                </span>
+                              )}
+                            </div>
+                            <span className="line-clamp-1">{sub.title}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+                )}
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    {subjectsData.map((sub) => {
-                      const isSelected = selectedSubject.id === sub.id;
+                {/* Step 2: Dynamic Levels & Exam Boards */}
+                {selectedSubject && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-2">
+                        Academic Level * (Dynamic for {selectedSubject.title})
+                      </label>
+                      <select
+                        value={selectedLevelLabel}
+                        onChange={(e) => setSelectedLevelLabel(e.target.value)}
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors appearance-none cursor-pointer"
+                      >
+                        {currentLevels.map((lvl) => (
+                          <option key={lvl.id} value={lvl.label}>
+                            {lvl.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
+                    <div>
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-2">
+                        Exam Board Specification *
+                      </label>
+                      <select
+                        value={selectedBoardLabel}
+                        onChange={(e) => setSelectedBoardLabel(e.target.value)}
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors appearance-none cursor-pointer"
+                      >
+                        {currentBoards.map((b) => (
+                          <option key={b.id} value={b.label}>
+                            {b.label} {b.syllabus ? `(${b.syllabus})` : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Session Format */}
+                <div>
+                  <label className="block font-['Archivo_Black'] text-lg text-on-background mb-3">
+                    2. Choose Mentorship Format
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      {
+                        title: "1:1 Intensive Mentorship",
+                        badge: "POPULAR",
+                        desc: "Dedicated senior specialist tailored to student's exact syllabus.",
+                      },
+                      {
+                        title: "Small Group Masterclass (Max 4)",
+                        badge: "INTERACTIVE",
+                        desc: "Collaborative problem-solving with peers at matching target grades.",
+                      },
+                      {
+                        title: "Diagnostic Exam Assessment",
+                        badge: "TRIAL",
+                        desc: "Full syllabus gap-analysis and benchmark grade prediction.",
+                      },
+                    ].map((fmt) => {
+                      const isSelected = selectedFormat === fmt.title;
                       return (
-                        <button
-                          type="button"
-                          key={sub.id}
-                          onClick={() => handleSelectSubject(sub)}
-                          className={`p-3.5 rounded-xl border-2 font-['Work_Sans'] font-bold text-xs md:text-sm text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        <div
+                          key={fmt.title}
+                          onClick={() => setSelectedFormat(fmt.title)}
+                          className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
                             isSelected
-                              ? "bg-primary-container border-on-background text-on-background neo-brutalist-shadow"
-                              : "bg-background border-line text-on-surface-variant hover:bg-surface-container hover:border-on-background/40"
+                              ? "bg-on-background text-white border-on-background shadow-[4px_4px_0_0_var(--color-primary-container)]"
+                              : "bg-[#faf8f2] border-line text-on-background hover:border-on-background/40"
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <span className="font-['IBM_Plex_Mono'] text-[10px] font-bold text-[#c0392b]">
-                              {sub.num}
-                            </span>
-                            {sub.badgeType === "red-outline" && (
-                              <span className="font-['IBM_Plex_Mono'] text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#c0392b] text-[#c0392b]">
-                                {sub.tag}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span
+                                className={`font-['IBM_Plex_Mono'] text-[9px] font-bold px-2 py-0.5 rounded-full border ${
+                                  isSelected
+                                    ? "bg-primary-container text-on-background border-primary-container"
+                                    : "bg-surface-container border-line text-on-surface-variant"
+                                }`}
+                              >
+                                {fmt.badge}
                               </span>
-                            )}
+                            </div>
+                            <h5 className="font-['Archivo_Black'] text-sm mb-1.5 leading-snug">
+                              {fmt.title}
+                            </h5>
+                            <p
+                              className={`font-['Work_Sans'] text-xs leading-relaxed ${
+                                isSelected
+                                  ? "text-surface-variant"
+                                  : "text-on-surface-variant"
+                              }`}
+                            >
+                              {fmt.desc}
+                            </p>
                           </div>
-                          <span className="line-clamp-1">{sub.title}</span>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Step 2: Dynamic Levels & Exam Boards (Derived from selectedSubject) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-2">
-                      Academic Level * (Dynamic for {selectedSubject.title})
-                    </label>
-                    <select
-                      value={selectedLevelLabel}
-                      onChange={(e) => setSelectedLevelLabel(e.target.value)}
-                      className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors appearance-none cursor-pointer"
-                    >
-                      {currentLevels.map((lvl) => (
-                        <option key={lvl.id} value={lvl.label}>
-                          {lvl.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block font-['Work_Sans'] font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-2">
-                      Exam Board * (Dynamic for {selectedLevelLabel})
-                    </label>
-                    <select
-                      value={selectedBoardLabel}
-                      onChange={(e) => setSelectedBoardLabel(e.target.value)}
-                      className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors appearance-none cursor-pointer"
-                    >
-                      {currentBoards.map((brd) => (
-                        <option key={brd.id} value={brd.label}>
-                          {brd.label}{" "}
-                          {brd.syllabus ? `(Syllabus ${brd.syllabus})` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Modules Preview Badge */}
-                {activeBoardObj?.modules &&
-                  activeBoardObj.modules.length > 0 && (
-                    <div className="bg-[#f5f2e9]/70 rounded-2xl p-4 border border-line space-y-2">
-                      <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-[#c0392b] tracking-wider block">
-                        Target Curriculum Modules ({selectedBoardLabel}):
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {activeBoardObj.modules.map((mod, idx) => (
-                          <span
-                            key={idx}
-                            className="font-['Work_Sans'] text-xs bg-white px-2.5 py-1 rounded-lg border border-line text-on-background font-medium"
-                          >
-                            • {mod}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                {/* Step 3: Session Format */}
+                {/* Step 4: Time Slot Selection */}
                 <div>
-                  <label className="block font-['Archivo_Black'] text-base text-on-background mb-3">
-                    2. Preferred Session Format
+                  <label className="block font-['Archivo_Black'] text-lg text-on-background mb-3">
+                    3. Preferred Weekly Time Window
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
-                      {
-                        title: "1:1 Intensive Mentorship",
-                        desc: `Personalized 1:1 focus with ${selectedTeacher?.name || "Specialist"}`,
-                      },
-                      {
-                        title: "Small Group Masterclass (Max 4)",
-                        desc: "Peer discussion & collaborative past-paper drills",
-                      },
-                    ].map((fmt) => (
-                      <div
-                        key={fmt.title}
-                        onClick={() => setSelectedFormat(fmt.title)}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                          selectedFormat === fmt.title
-                            ? "bg-primary-container/25 border-on-background shadow-xs"
-                            : "bg-background border-line hover:border-on-background/40"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
-                            {fmt.title}
-                          </span>
-                          <input
-                            type="radio"
-                            name="format"
-                            checked={selectedFormat === fmt.title}
-                            onChange={() => setSelectedFormat(fmt.title)}
-                            className="accent-[#c0392b]"
-                          />
-                        </div>
-                        <p className="font-['Work_Sans'] text-xs text-on-surface-variant">
-                          {fmt.desc}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Step 4: Time Slot */}
-                <div>
-                  <label className="block font-['Archivo_Black'] text-base text-on-background mb-2">
-                    3. Select Preferred Time Slot (GST / UAE &amp; PKT Friendly)
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      "2:00 PM - 3:30 PM GST (Dubai)",
-                      "4:00 PM - 5:30 PM GST (Dubai)",
-                      "6:00 PM - 7:30 PM GST (Dubai)",
-                      "8:00 PM - 9:30 PM GST (Dubai)",
+                      "4:00 PM - 5:30 PM GST (Dubai / GCC)",
+                      "5:30 PM - 7:00 PM GST (Dubai / GCC)",
+                      "7:00 PM - 8:30 PM GST (Dubai / GCC)",
+                      "Weekend Morning (10:00 AM - 1:00 PM GST)",
                     ].map((slot) => (
-                      <button
-                        type="button"
+                      <label
                         key={slot}
                         onClick={() => setSelectedTimeSlot(slot)}
-                        className={`p-3 rounded-xl border-2 font-['IBM_Plex_Mono'] text-xs text-left transition-all cursor-pointer ${
+                        className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                           selectedTimeSlot === slot
-                            ? "bg-on-background text-white border-on-background shadow-xs"
-                            : "bg-background border-line text-on-background hover:bg-surface-container"
+                            ? "bg-[#faf8f2] border-on-background font-bold text-on-background"
+                            : "bg-white border-line text-on-surface-variant hover:border-on-background/30"
                         }`}
                       >
-                        {slot}
-                      </button>
+                        <input
+                          type="radio"
+                          name="timeSlot"
+                          checked={selectedTimeSlot === slot}
+                          onChange={() => setSelectedTimeSlot(slot)}
+                          className="w-4 h-4 accent-primary-container"
+                        />
+                        <span className="font-['Work_Sans'] text-xs sm:text-sm">
+                          {slot}
+                        </span>
+                      </label>
                     ))}
                   </div>
                 </div>
 
-                {/* Step 5: Contact Details */}
-                <div className="border-t border-line pt-6 space-y-4">
-                  <h3 className="font-['Archivo_Black'] text-base text-on-background">
-                    4. Contact Details (Lead Capture)
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Step 5: Student & Contact Details */}
+                <div className="border-t-2 border-line pt-6">
+                  <label className="block font-['Archivo_Black'] text-lg text-on-background mb-4">
+                    4. Student &amp; Contact Details
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="block font-['Work_Sans'] text-xs font-bold text-on-surface-variant mb-1">
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase text-on-surface-variant mb-1.5">
                         Parent / Guardian Name *
                       </label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. Sarah Ahmad"
+                        placeholder="e.g. Mrs. Sarah Al-Mansoor"
                         value={formData.parentName}
                         onChange={(e) =>
                           setFormData({
@@ -580,17 +622,18 @@ function BookingContent() {
                             parentName: e.target.value,
                           })
                         }
-                        className="w-full p-3 bg-white border-2 border-line rounded-xl text-sm font-['Work_Sans'] focus:border-on-background focus:outline-none"
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors"
                       />
                     </div>
+
                     <div>
-                      <label className="block font-['Work_Sans'] text-xs font-bold text-on-surface-variant mb-1">
-                        Student Name *
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase text-on-surface-variant mb-1.5">
+                        Student Full Name *
                       </label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. Tariq Ahmad"
+                        placeholder="e.g. Tariq Al-Mansoor"
                         value={formData.studentName}
                         onChange={(e) =>
                           setFormData({
@@ -598,12 +641,31 @@ function BookingContent() {
                             studentName: e.target.value,
                           })
                         }
-                        className="w-full p-3 bg-white border-2 border-line rounded-xl text-sm font-['Work_Sans'] focus:border-on-background focus:outline-none"
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors"
                       />
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="block font-['Work_Sans'] text-xs font-bold text-on-surface-variant mb-1">
-                        WhatsApp Number *
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase text-on-surface-variant mb-1.5">
+                        Parent Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="name@example.com"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase text-on-surface-variant mb-1.5">
+                        WhatsApp / Mobile Number *
                       </label>
                       <input
                         type="tel"
@@ -613,146 +675,144 @@ function BookingContent() {
                         onChange={(e) =>
                           setFormData({ ...formData, phone: e.target.value })
                         }
-                        className="w-full p-3 bg-white border-2 border-line rounded-xl text-sm font-['Work_Sans'] focus:border-on-background focus:outline-none"
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors"
                       />
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block font-['Work_Sans'] text-xs font-bold text-on-surface-variant mb-1">
-                        Email Address *
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase text-on-surface-variant mb-1.5">
+                        Target Grade Goal
+                      </label>
+                      <select
+                        value={formData.targetGrade}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            targetGrade: e.target.value,
+                          })
+                        }
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors appearance-none cursor-pointer"
+                      >
+                        <option value="A* (90%+ Highest Distinction)">
+                          A* (90%+ Highest Distinction)
+                        </option>
+                        <option value="A (80%-89% Grade A)">
+                          A (80%-89% Grade A)
+                        </option>
+                        <option value="B to A Grade Jump">
+                          B to A Grade Jump
+                        </option>
+                        <option value="C to A Turnaround Strategy">
+                          C to A Turnaround Strategy
+                        </option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-['Work_Sans'] font-bold text-xs uppercase text-on-surface-variant mb-1.5">
+                        Additional Notes (Optional)
                       </label>
                       <input
-                        type="email"
-                        required
-                        placeholder="sarah@example.com"
-                        value={formData.email}
+                        type="text"
+                        placeholder="Current mock grades, weak topics..."
+                        value={formData.additionalNotes}
                         onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
+                          setFormData({
+                            ...formData,
+                            additionalNotes: e.target.value,
+                          })
                         }
-                        className="w-full p-3 bg-white border-2 border-line rounded-xl text-sm font-['Work_Sans'] focus:border-on-background focus:outline-none"
+                        className="w-full p-3.5 bg-background border-2 border-line focus:border-on-background rounded-xl font-['Work_Sans'] text-sm focus:outline-none transition-colors"
                       />
                     </div>
                   </div>
                 </div>
 
+                {/* Submit Action */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-base py-4 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-base py-4 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Saving Request...</span>
+                      <span>Submitting Consultation Request...</span>
                     </>
-                  ) : selectedTeacher ? (
-                    `Request Consultation with ${selectedTeacher.name}`
                   ) : (
-                    `Request ${selectedSubject.title} Consultation`
+                    <>
+                      <span>
+                        Confirm &amp; Book Consultation with{" "}
+                        {selectedTeacher?.name || "Specialist"}
+                      </span>
+                      <Calendar className="w-4 h-4" />
+                    </>
                   )}
                 </button>
-                <p className="text-center font-['Work_Sans'] text-xs text-muted">
-                   An Alinea academic coordinator
-                  will manually follow up to confirm your trial session.
-                </p>
               </form>
             </div>
 
-            {/* Dynamic Live Summary Sidebar */}
+            {/* Sidebar Summary Card */}
             <div className="lg:col-span-4 flex flex-col gap-6 sticky top-24">
-              <div className="bg-on-background text-white p-6 md:p-7 rounded-3xl border-2 border-on-background shadow-lg">
-                <span className="bg-primary-container text-on-background font-['IBM_Plex_Mono'] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  CONSULTATION SUMMARY
-                </span>
+              <div className="bg-[#f5f2e9] rounded-3xl p-6 md:p-8 border-2 border-on-background neo-brutalist-shadow">
+                <div className="flex items-center gap-2 mb-4">
+                  <ShieldCheck className="w-5 h-5 text-[#c0392b]" />
+                  <span className="font-['IBM_Plex_Mono'] text-xs font-bold text-on-background uppercase tracking-wider">
+                    CONSULTATION SUMMARY
+                  </span>
+                </div>
 
-                <div className="my-6 border-b border-white/15 pb-5 space-y-4">
-                  {selectedTeacher && (
-                    <div className="flex items-center gap-3.5 bg-white/10 p-3 rounded-2xl border border-white/10">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden relative shrink-0 border border-primary-container">
-                        <Image
-                          src={selectedTeacher.image}
-                          alt={selectedTeacher.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-['IBM_Plex_Mono'] text-[10px] text-primary-container uppercase font-bold">
-                          Lead Examiner
-                        </p>
-                        <p className="font-['Archivo_Black'] text-white text-sm truncate">
-                          {selectedTeacher.name}
-                        </p>
-                        <p className="font-['Work_Sans'] text-[11px] text-surface-variant truncate">
-                          {selectedTeacher.qualification}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
+                <div className="space-y-4 font-['Work_Sans'] text-sm border-b border-line pb-6 mb-6">
                   <div>
-                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
-                      Target Subject
-                    </p>
-                    <p className="font-['Archivo_Black'] text-primary-container text-lg leading-snug">
-                      {selectedSubject.title}
-                    </p>
-                    <p className="font-['Work_Sans'] text-xs text-white/80">
-                      Level: {selectedLevelLabel}
-                    </p>
+                    <span className="text-xs text-on-surface-variant block mb-0.5">
+                      Subject
+                    </span>
+                    <strong className="text-on-background text-base">
+                      {selectedSubject?.title || "Not selected"}
+                    </strong>
                   </div>
-
                   <div>
-                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
-                      Exam Board Alignment
-                    </p>
-                    <p className="font-['Work_Sans'] font-bold text-white text-sm">
-                      {selectedBoardLabel}
-                    </p>
-                    {activeBoardObj?.syllabus && (
-                      <p className="font-['IBM_Plex_Mono'] text-[11px] text-primary-container">
-                        Syllabus Code: {activeBoardObj.syllabus}
-                      </p>
-                    )}
+                    <span className="text-xs text-on-surface-variant block mb-0.5">
+                      Level &amp; Board
+                    </span>
+                    <strong className="text-on-background">
+                      {selectedLevelLabel} · {selectedBoardLabel}
+                    </strong>
                   </div>
-
                   <div>
-                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
-                      Selected Slot
-                    </p>
-                    <p className="font-['IBM_Plex_Mono'] text-xs text-primary-container font-bold">
-                      {selectedTimeSlot}
-                    </p>
+                    <span className="text-xs text-on-surface-variant block mb-0.5">
+                      Specialist Tutor
+                    </span>
+                    <strong className="text-on-background">
+                      {selectedTeacher?.name || "Examiner Lead"}
+                    </strong>
                   </div>
-
                   <div>
-                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted uppercase">
-                      Format
-                    </p>
-                    <p className="font-['Work_Sans'] text-xs text-surface-variant font-bold">
+                    <span className="text-xs text-on-surface-variant block mb-0.5">
+                      Mentorship Format
+                    </span>
+                    <strong className="text-on-background text-xs">
                       {selectedFormat}
-                    </p>
+                    </strong>
                   </div>
                 </div>
 
-                <div className="bg-white/10 p-4 rounded-2xl border border-white/10 space-y-2.5 mb-5">
-                  <div className="flex items-center gap-2 text-xs font-['Work_Sans'] text-primary-container font-bold">
-                    <ShieldCheck className="w-4 h-4 shrink-0" />
-                    <span>Mark-scheme first diagnostic audit</span>
+                <div className="space-y-3 font-['Work_Sans'] text-xs text-on-surface-variant">
+                  <div className="flex items-center gap-2 text-emerald-800 font-bold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                    Examiner-Report-Driven Mark-Scheme Teaching
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-['Work_Sans'] text-surface-variant">
-                    <Clock className="w-4 h-4 shrink-0" />
-                    <span>Initial session: 45 Minutes</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-on-background" />
+                    Direct Academic Oversight by Founders
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-['Work_Sans'] text-surface-variant">
-                    <Calendar className="w-4 h-4 shrink-0" />
-                    <span>Confirmation within 2 hours</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-on-background" />
+                    Diagnostic Syllabus Gap-Analysis Included
                   </div>
                 </div>
-
-                <p className="text-[11px] text-muted text-center font-['IBM_Plex_Mono'] leading-relaxed">
-                  Confirmation and schedule matching is handled directly by an
-                  Alinea academic representative.
-                </p>
               </div>
             </div>
           </div>
@@ -766,10 +826,8 @@ export default function BookingPage() {
   return (
     <Suspense
       fallback={
-        <div className="w-full min-h-screen bg-background flex items-center justify-center p-12">
-          <div className="font-['Work_Sans'] text-sm text-on-surface-variant animate-pulse">
-            Loading consultation form...
-          </div>
+        <div className="min-h-screen flex items-center justify-center bg-[#faf8f2]">
+          <Loader2 className="w-8 h-8 animate-spin text-[#c0392b]" />
         </div>
       }
     >

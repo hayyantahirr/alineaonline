@@ -74,19 +74,17 @@ export default function FacultyPage() {
         if (isMounted) {
           if (
             data.success &&
-            Array.isArray(data.teachers) &&
-            data.teachers.length > 0
+            Array.isArray(data.teachers)
           ) {
             setTeachers(data.teachers);
           } else {
-            // Fallback to preconfigured faculty members
-            setTeachers(fallbackFaculty);
+            setTeachers([]);
           }
         }
       } catch (err) {
         console.error("Error fetching teachers:", err);
         if (isMounted) {
-          setTeachers(fallbackFaculty);
+          setTeachers([]);
         }
       } finally {
         if (isMounted) {

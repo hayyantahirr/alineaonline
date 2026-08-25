@@ -24,16 +24,22 @@ export default function CurriculumGrid({ board }) {
           </h4>
         </div>
         <ul className="flex flex-col gap-2.5">
-          {board.modules.map((mod, i) => (
-            <li key={i} className="flex items-start gap-2.5">
-              <span className="text-[#c0392b] font-bold text-sm leading-none mt-0.5">
-                ✓
-              </span>
-              <span className="font-['Work_Sans'] text-sm text-on-background leading-relaxed">
-                {mod}
-              </span>
+          {(board.modules || []).length > 0 ? (
+            board.modules.map((mod, i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                <span className="text-[#c0392b] font-bold text-sm leading-none mt-0.5">
+                  ✓
+                </span>
+                <span className="font-['Work_Sans'] text-sm text-on-background leading-relaxed">
+                  {mod}
+                </span>
+              </li>
+            ))
+          ) : (
+            <li className="text-xs text-on-surface-variant italic">
+              Modules will be listed soon.
             </li>
-          ))}
+          )}
         </ul>
       </div>
 
@@ -46,14 +52,20 @@ export default function CurriculumGrid({ board }) {
           </h4>
         </div>
         <ul className="flex flex-col gap-2.5">
-          {board.examStructure.map((exam, i) => (
-            <li
-              key={i}
-              className="font-['Work_Sans'] text-sm text-on-background bg-[#f5f2e9]/60 rounded-lg px-3.5 py-2.5 border border-line leading-relaxed"
-            >
-              {exam}
+          {(board.examStructure || []).length > 0 ? (
+            board.examStructure.map((exam, i) => (
+              <li
+                key={i}
+                className="font-['Work_Sans'] text-sm text-on-background bg-[#f5f2e9]/60 rounded-lg px-3.5 py-2.5 border border-line leading-relaxed"
+              >
+                {exam}
+              </li>
+            ))
+          ) : (
+            <li className="text-xs text-on-surface-variant italic">
+              Exam components will be listed soon.
             </li>
-          ))}
+          )}
         </ul>
       </div>
 
@@ -66,16 +78,22 @@ export default function CurriculumGrid({ board }) {
           </h4>
         </div>
         <ul className="flex flex-col gap-2.5">
-          {board.skills.map((skill, i) => (
-            <li key={i} className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
-                {i + 1}
-              </span>
-              <span className="font-['Work_Sans'] text-sm text-on-background leading-relaxed">
-                {skill}
-              </span>
+          {(board.skills || []).length > 0 ? (
+            board.skills.map((skill, i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
+                  {i + 1}
+                </span>
+                <span className="font-['Work_Sans'] text-sm text-on-background leading-relaxed">
+                  {skill}
+                </span>
+              </li>
+            ))
+          ) : (
+            <li className="text-xs text-on-surface-variant italic">
+              Targeted skills will be listed soon.
             </li>
-          ))}
+          )}
         </ul>
       </div>
     </div>

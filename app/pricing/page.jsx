@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   CheckCircle2,
   ArrowRight,
@@ -10,12 +10,28 @@ import {
   BookOpen,
 } from "lucide-react";
 import { packages, countries } from "@/data/pricingData";
-import { subjectsData } from "@/data/subjectsData";
 import Link from "next/link";
 
 export default function PricingPage() {
+  const [subjects, setSubjects] = useState([]);
   const [selectedCountryCode, setSelectedCountryCode] = useState("AE");
   const [selectedPackageId, setSelectedPackageId] = useState("diagnostic");
+
+  // Fetch subjects from server-side API route
+  useEffect(() => {
+    async function fetchSubjects() {
+      try {
+        const res = await fetch("/api/subjects");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.subjects)) {
+          setSubjects(data.subjects);
+        }
+      } catch (err) {
+        console.error("Error fetching subjects in pricing:", err);
+      }
+    }
+    fetchSubjects();
+  }, []);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -70,7 +86,7 @@ export default function PricingPage() {
   };
 
   // Derived options for dropdowns based on subject selection
-  const selectedSubjectData = subjectsData.find(
+  const selectedSubjectData = subjects.find(
     (s) => s.id === formData.subjectId,
   );
   const availableLevels = selectedSubjectData?.levels || [];
@@ -362,7 +378,7 @@ export default function PricingPage() {
                       className="font-['Work_Sans'] text-sm bg-[#faf8f2] border-2 border-line rounded-xl px-4 py-3 text-on-background focus:border-on-background focus:outline-none transition-colors appearance-none"
                     >
                       <option value="">Select a Subject...</option>
-                      {subjectsData.map((s) => (
+                      {subjects.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.title}
                         </option>
