@@ -86,9 +86,7 @@ export default function PricingPage() {
   };
 
   // Derived options for dropdowns based on subject selection
-  const selectedSubjectData = subjects.find(
-    (s) => s.id === formData.subjectId,
-  );
+  const selectedSubjectData = subjects.find((s) => s.id === formData.subjectId);
   const availableLevels = selectedSubjectData?.levels || [];
 
   const selectedLevelData = availableLevels.find(
@@ -104,9 +102,13 @@ export default function PricingPage() {
     const pkg = packages.find((p) => p.id === selectedPackageId) || packages[0];
     const formattedPriceStr = formatPrice(pkg.basePrice);
 
-    const subjectTitle = selectedSubjectData?.title || formData.subjectId || "Not specified";
-    const levelTitle = selectedLevelData?.label || formData.levelId || "Not specified";
-    const selectedBoardData = availableBoards.find((b) => b.id === formData.boardId);
+    const subjectTitle =
+      selectedSubjectData?.title || formData.subjectId || "Not specified";
+    const levelTitle =
+      selectedLevelData?.label || formData.levelId || "Not specified";
+    const selectedBoardData = availableBoards.find(
+      (b) => b.id === formData.boardId,
+    );
     const boardTitle = selectedBoardData?.label
       ? `${selectedBoardData.label}${selectedBoardData.syllabus ? ` (${selectedBoardData.syllabus})` : ""}`
       : formData.boardId || "Not specified";

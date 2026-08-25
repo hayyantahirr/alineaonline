@@ -72,10 +72,7 @@ export default function FacultyPage() {
         const data = await res.json();
 
         if (isMounted) {
-          if (
-            data.success &&
-            Array.isArray(data.teachers)
-          ) {
+          if (data.success && Array.isArray(data.teachers)) {
             setTeachers(data.teachers);
           } else {
             setTeachers([]);

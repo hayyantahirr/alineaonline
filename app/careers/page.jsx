@@ -180,7 +180,9 @@ export default function CareersPage() {
       .filter((h) => h.length > 0);
 
     if (cleanedHighlights.length < 3) {
-      setSubmitError("Please provide at least 3 key teaching highlights & methodology points.");
+      setSubmitError(
+        "Please provide at least 3 key teaching highlights & methodology points.",
+      );
       return;
     }
 
@@ -190,7 +192,9 @@ export default function CareersPage() {
     }
 
     if (formData.availabilitySlots.length === 0) {
-      setSubmitError("Please select at least one preferred teaching time slot.");
+      setSubmitError(
+        "Please select at least one preferred teaching time slot.",
+      );
       return;
     }
 
@@ -236,14 +240,16 @@ export default function CareersPage() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to submit application. Please try again.");
+        throw new Error(
+          data.error || "Failed to submit application. Please try again.",
+        );
       }
 
       setIsSubmitted(true);
     } catch (err) {
       console.error("Career application submission error:", err);
       setSubmitError(
-        err.message || "Could not submit application. Please try again."
+        err.message || "Could not submit application. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -257,15 +263,17 @@ export default function CareersPage() {
   const handleCvChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const ext = file.name.split('.').pop().toLowerCase();
-      const allowedExts = ['pdf', 'doc', 'docx'];
-      
+      const ext = file.name.split(".").pop().toLowerCase();
+      const allowedExts = ["pdf", "doc", "docx"];
+
       if (allowedExts.includes(ext)) {
         setCvFile(file);
         setSubmitError("");
       } else {
         setCvFile(null);
-        setSubmitError("Invalid file type. Please upload your CV as a .pdf, .doc, or .docx file.");
+        setSubmitError(
+          "Invalid file type. Please upload your CV as a .pdf, .doc, or .docx file.",
+        );
       }
     }
   };
@@ -363,7 +371,8 @@ export default function CareersPage() {
             <div className="lg:col-span-7 flex flex-col gap-4">
               <div className="flex items-center gap-3">
                 <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wide text-on-surface-variant flex items-center gap-2">
-                  <span className="w-5 h-0.5 bg-[#c0392b]"></span> Join Our Faculty
+                  <span className="w-5 h-0.5 bg-[#c0392b]"></span> Join Our
+                  Faculty
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success/10 border border-success/30 font-['IBM_Plex_Mono'] text-[10px] font-bold text-success-dark">
                   <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
@@ -392,9 +401,9 @@ export default function CareersPage() {
               </h1>
 
               <p className="font-['Work_Sans'] text-sm sm:text-base md:text-lg text-on-surface-variant max-w-xl leading-relaxed">
-                We&apos;re looking for experienced, exam-board-literate teachers who
-                care about grade outcomes — not just lesson delivery. If you know
-                the mark scheme inside out, we want to hear from you.
+                We&apos;re looking for experienced, exam-board-literate teachers
+                who care about grade outcomes — not just lesson delivery. If you
+                know the mark scheme inside out, we want to hear from you.
               </p>
 
               {/* Quick Perks Pill Strip */}
@@ -445,14 +454,19 @@ export default function CareersPage() {
               className="inline-flex items-center gap-1 hover:text-on-background transition-colors font-bold group"
             >
               <span>Scroll to explore</span>
-              <span className="group-hover:translate-y-0.5 transition-transform">↓</span>
+              <span className="group-hover:translate-y-0.5 transition-transform">
+                ↓
+              </span>
             </a>
           </div>
         </div>
       </section>
 
       {/* Why Teach With Us + Requirements */}
-      <section id="requirements" className="py-14 md:py-20 px-6 max-w-container-max mx-auto scroll-mt-6">
+      <section
+        id="requirements"
+        className="py-14 md:py-20 px-6 max-w-container-max mx-auto scroll-mt-6"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
           {/* What We Offer */}
           <div>
@@ -892,7 +906,10 @@ export default function CareersPage() {
                       {formData.availabilitySlots.length > 0 && (
                         <span className="text-[11px] font-semibold text-[#c0392b] bg-[#c0392b]/10 px-2 py-0.5 rounded-md">
                           {formData.availabilitySlots.length} slot
-                          {formData.availabilitySlots.length > 1 ? "s" : ""} selected
+                          {formData.availabilitySlots.length > 1
+                            ? "s"
+                            : ""}{" "}
+                          selected
                         </span>
                       )}
                     </div>
@@ -924,7 +941,8 @@ export default function CareersPage() {
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                         {presetSlots.map((slot) => {
-                          const isSelected = formData.availabilitySlots.includes(slot);
+                          const isSelected =
+                            formData.availabilitySlots.includes(slot);
                           return (
                             <button
                               key={slot}
@@ -972,7 +990,9 @@ export default function CareersPage() {
                 </div>
 
                 <p className="font-['Work_Sans'] text-xs text-on-surface-variant mb-4 leading-relaxed">
-                  Provide at least 3 concise bullet points highlighting your mark-scheme familiarity, student grade improvement records, exam-board mastery, or essay/numerical coaching frameworks.
+                  Provide at least 3 concise bullet points highlighting your
+                  mark-scheme familiarity, student grade improvement records,
+                  exam-board mastery, or essay/numerical coaching frameworks.
                 </p>
 
                 <div className="flex flex-col gap-3">
@@ -985,15 +1005,17 @@ export default function CareersPage() {
                         <input
                           type="text"
                           value={highlight}
-                          onChange={(e) => handleHighlightChange(idx, e.target.value)}
+                          onChange={(e) =>
+                            handleHighlightChange(idx, e.target.value)
+                          }
                           placeholder={`e.g. ${
                             idx === 0
                               ? "Lesson plans built directly from official examiner reports and marking rubrics"
                               : idx === 1
-                              ? "Specialist in 20-mark evaluation essay frameworks and data-response accuracy"
-                              : idx === 2
-                              ? "Over 6 years coaching top-grade students across CAIE, Edexcel, and AQA"
-                              : "Trained 15+ faculty members on Alinea's mark-scheme-first methodology"
+                                ? "Specialist in 20-mark evaluation essay frameworks and data-response accuracy"
+                                : idx === 2
+                                  ? "Over 6 years coaching top-grade students across CAIE, Edexcel, and AQA"
+                                  : "Trained 15+ faculty members on Alinea's mark-scheme-first methodology"
                           }`}
                           className="w-full font-['Work_Sans'] text-sm bg-white border-2 border-line rounded-xl px-4 py-3 text-on-background placeholder:text-muted/60 focus:border-on-background focus:outline-none transition-colors"
                         />
@@ -1023,7 +1045,11 @@ export default function CareersPage() {
                   </button>
 
                   <span className="font-['IBM_Plex_Mono'] text-[11px] text-muted">
-                    {formData.highlights.filter((h) => h.trim().length > 0).length} of {formData.highlights.length} filled (min 3)
+                    {
+                      formData.highlights.filter((h) => h.trim().length > 0)
+                        .length
+                    }{" "}
+                    of {formData.highlights.length} filled (min 3)
                   </span>
                 </div>
               </div>
@@ -1168,5 +1194,3 @@ export default function CareersPage() {
     </div>
   );
 }
-
-

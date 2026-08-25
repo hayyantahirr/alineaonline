@@ -38,14 +38,16 @@ export default function ContactPage() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to send message. Please try again.");
+        throw new Error(
+          data.error || "Failed to send message. Please try again.",
+        );
       }
 
       setIsSubmitted(true);
     } catch (err) {
       console.error("Contact submission error:", err);
       setErrorMessage(
-        err.message || "Could not submit your message. Please try again."
+        err.message || "Could not submit your message. Please try again.",
       );
     } finally {
       setIsLoading(false);

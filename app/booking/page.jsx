@@ -28,8 +28,11 @@ function BookingContent() {
 
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [selectedLevelLabel, setSelectedLevelLabel] = useState(levelParam || "A-Level");
-  const [selectedBoardLabel, setSelectedBoardLabel] = useState("Edexcel (Pearson)");
+  const [selectedLevelLabel, setSelectedLevelLabel] = useState(
+    levelParam || "A-Level",
+  );
+  const [selectedBoardLabel, setSelectedBoardLabel] =
+    useState("Edexcel (Pearson)");
 
   const [selectedFormat, setSelectedFormat] = useState(
     "1:1 Intensive Mentorship",
@@ -67,12 +70,14 @@ function BookingContent() {
         const subjectsData = await subjectsRes.json();
 
         if (isMounted) {
-          const loadedTeachers = teachersData.success && Array.isArray(teachersData.teachers)
-            ? teachersData.teachers
-            : [];
-          const loadedSubjects = subjectsData.success && Array.isArray(subjectsData.subjects)
-            ? subjectsData.subjects
-            : [];
+          const loadedTeachers =
+            teachersData.success && Array.isArray(teachersData.teachers)
+              ? teachersData.teachers
+              : [];
+          const loadedSubjects =
+            subjectsData.success && Array.isArray(subjectsData.subjects)
+              ? subjectsData.subjects
+              : [];
 
           setTeachers(loadedTeachers);
           setSubjects(loadedSubjects);
@@ -104,7 +109,9 @@ function BookingContent() {
               (s) =>
                 s.title
                   ?.toLowerCase()
-                  .includes(resolvedTeacher.subjectBookingParam?.toLowerCase() || "") ||
+                  .includes(
+                    resolvedTeacher.subjectBookingParam?.toLowerCase() || "",
+                  ) ||
                 resolvedTeacher.subject
                   ?.toLowerCase()
                   .includes(s.title?.toLowerCase().split(" ")[0] || ""),
@@ -148,8 +155,9 @@ function BookingContent() {
 
   // Current Level Object (derived from selectedSubject)
   const currentLevels = selectedSubject?.levels || [];
-  const activeLevelObj =
-    currentLevels.find((l) => l.label === selectedLevelLabel) ||
+  const activeLevelObj = currentLevels.find(
+    (l) => l.label === selectedLevelLabel,
+  ) ||
     currentLevels[0] || { boards: [] };
 
   // Current Boards for active level
@@ -176,12 +184,17 @@ function BookingContent() {
   // Handler when user selects a Subject button
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
-    const leadTeacher = teachers.find(
-      (f) =>
-        f.subject?.toLowerCase().includes(subject.title?.toLowerCase().split(" ")[0] || "") ||
-        (f.subjectBookingParam &&
-          subject.title?.toLowerCase().includes(f.subjectBookingParam.toLowerCase())),
-    ) || teachers[0];
+    const leadTeacher =
+      teachers.find(
+        (f) =>
+          f.subject
+            ?.toLowerCase()
+            .includes(subject.title?.toLowerCase().split(" ")[0] || "") ||
+          (f.subjectBookingParam &&
+            subject.title
+              ?.toLowerCase()
+              .includes(f.subjectBookingParam.toLowerCase())),
+      ) || teachers[0];
     if (leadTeacher) setSelectedTeacher(leadTeacher);
   };
 
@@ -197,7 +210,9 @@ function BookingContent() {
         s.title
           ?.toLowerCase()
           .includes(t.subjectBookingParam?.toLowerCase() || "") ||
-        t.subject?.toLowerCase().includes(s.title?.toLowerCase().split(" ")[0] || ""),
+        t.subject
+          ?.toLowerCase()
+          .includes(s.title?.toLowerCase().split(" ")[0] || ""),
     );
     if (matchingSub) {
       setSelectedSubject(matchingSub);
@@ -266,8 +281,8 @@ function BookingContent() {
             {selectedTeacher
               ? `Book a Session with ${selectedTeacher.name}`
               : selectedSubject
-              ? `Book Your ${selectedSubject.title} Consultation`
-              : "Book Your Academic Consultation"}
+                ? `Book Your ${selectedSubject.title} Consultation`
+                : "Book Your Academic Consultation"}
           </h1>
           <p className="font-['Work_Sans'] text-base md:text-lg text-surface-variant max-w-2xl mx-auto leading-relaxed">
             Select your target subject, preferred examiner specialist, and time
@@ -311,9 +326,7 @@ function BookingContent() {
                 Exam Board: {selectedBoardLabel}{" "}
                 {activeBoardObj?.syllabus ? `(${activeBoardObj.syllabus})` : ""}
               </p>
-              <p className="text-muted pt-1">
-                No payment is required today.
-              </p>
+              <p className="text-muted pt-1">No payment is required today.</p>
             </div>
 
             <button
@@ -376,7 +389,8 @@ function BookingContent() {
                               : "bg-amber-50 text-amber-800 border-amber-300"
                           }`}
                         >
-                          ● {selectedTeacher.availability || "Accepting Students"}
+                          ●{" "}
+                          {selectedTeacher.availability || "Accepting Students"}
                         </span>
                       </div>
                       <h4 className="font-['Archivo_Black'] text-lg text-on-background flex items-center gap-2">
@@ -388,7 +402,10 @@ function BookingContent() {
                         )}
                       </h4>
                       <p className="font-['Work_Sans'] text-xs text-on-surface-variant">
-                        {selectedTeacher.role} {selectedTeacher.experience ? `· ${selectedTeacher.experience} Exp.` : ""}
+                        {selectedTeacher.role}{" "}
+                        {selectedTeacher.experience
+                          ? `· ${selectedTeacher.experience} Exp.`
+                          : ""}
                       </p>
                     </div>
                   </div>
@@ -406,7 +423,8 @@ function BookingContent() {
                       >
                         {teachers.map((fac) => (
                           <option key={fac.id} value={fac.id}>
-                            {fac.name} ({fac.subject?.split(" ")[0] || "Specialist"})
+                            {fac.name} (
+                            {fac.subject?.split(" ")[0] || "Specialist"})
                           </option>
                         ))}
                       </select>

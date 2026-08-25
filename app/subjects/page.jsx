@@ -25,9 +25,7 @@ export default function SubjectsPage() {
 
         if (isMounted) {
           const fetchedList =
-            data.success && Array.isArray(data.subjects)
-              ? data.subjects
-              : [];
+            data.success && Array.isArray(data.subjects) ? data.subjects : [];
 
           setSubjects(fetchedList);
 
@@ -78,7 +76,7 @@ export default function SubjectsPage() {
         setActiveBoard("");
       }
     },
-    [subjects]
+    [subjects],
   );
 
   const handleSelectLevel = useCallback(
@@ -88,7 +86,7 @@ export default function SubjectsPage() {
       const level = activeSubject?.levels?.find((l) => l.id === levelId);
       setActiveBoard(level?.boards?.[0]?.id || "");
     },
-    [activeSubject]
+    [activeSubject],
   );
 
   const handleSelectBoard = useCallback((boardId) => {
@@ -122,8 +120,8 @@ export default function SubjectsPage() {
           </h1>
           <p className="font-['Work_Sans'] text-base md:text-lg text-surface-variant max-w-2xl mx-auto leading-relaxed">
             Every subject module is mapped directly to exam board specifications
-            (CAIE, Edexcel, AQA, IB). Select a subject below to explore the exact
-            mark-scheme-aligned curriculum we teach.
+            (CAIE, Edexcel, AQA, IB). Select a subject below to explore the
+            exact mark-scheme-aligned curriculum we teach.
           </p>
         </div>
       </section>
@@ -189,10 +187,10 @@ export default function SubjectsPage() {
                 Edexcel, CAIE, AQA &amp; IB Specialists
               </h2>
               <p className="font-['Work_Sans'] text-base text-on-surface-variant leading-relaxed mb-6">
-                Different exam boards have distinctly different marking criteria.
-                Edexcel rewards clear step-by-step structure, while CAIE demands
-                specific technical vocabulary. Our subject leads are trained
-                specifically on board-level nuances.
+                Different exam boards have distinctly different marking
+                criteria. Edexcel rewards clear step-by-step structure, while
+                CAIE demands specific technical vocabulary. Our subject leads
+                are trained specifically on board-level nuances.
               </p>
               <div className="flex flex-wrap gap-3 font-['IBM_Plex_Mono'] text-xs">
                 <span className="px-3.5 py-1.5 bg-[#faf8f2] rounded-lg border border-line font-bold">
@@ -285,9 +283,9 @@ export default function SubjectsPage() {
           </div>
           <Link
             href={`/booking?teacher=${encodeURIComponent(
-              activeSubject.tutor || ""
+              activeSubject.tutor || "",
             )}&subject=${encodeURIComponent(
-              activeSubject.bookingParam || activeSubject.title || ""
+              activeSubject.bookingParam || activeSubject.title || "",
             )}`}
             className="shrink-0 bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs px-5 py-2.5 rounded-full"
           >
