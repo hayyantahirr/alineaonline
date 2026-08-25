@@ -1,20 +1,16 @@
 import Link from "next/link";
 import {
-  FileText,
   Download,
-  Sparkles,
   BookOpen,
-  ArrowRight,
   ArrowDown,
-  Clock,
-  User,
-  GraduationCap,
   Layers,
-  CheckCircle2,
-  Bookmark,
   Award,
 } from "lucide-react";
-import { blogArticles, freeResources } from "@/data/blogData";
+import { getPublishedBlogs } from "@/lib/blogs";
+import { freeResources } from "@/data/blogData";
+import BlogListSection from "@/components/blog/BlogListSection";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Examiner Blog & Free Study Resources | Alinea Online",
@@ -22,18 +18,26 @@ export const metadata = {
     "Explore high-yield examiner insights, 25-mark essay blueprints, and free downloadable revision vaults for CAIE, Edexcel, and AQA students.",
 };
 
-export default function BlogPage() {
-  const featuredArticle = blogArticles.find((a) => a.featured) || blogArticles[0];
-  const regularArticles = blogArticles.filter((a) => a.id !== featuredArticle.id);
+export default async function BlogPage() {
+  const blogs = await getPublishedBlogs();
+
+  // Compute unique categories on the server
+  const categorySet = new Set(["All"]);
+  blogs.forEach((b) => {
+    if (b.category && b.category.trim()) {
+      categorySet.add(b.category.trim());
+    }
+  });
+  const categories = Array.from(categorySet);
 
   return (
-    <div className="w-full bg-[#faf8f2] text-on-background min-h-screen grain-bg">
+    <div className="w-full bg-[#faf8f2] text-on-background min-h-screen">
       {/* Hero Header */}
       <section className="py-14 md:py-20 px-6 border-b-2 border-line bg-[#f5f2e9]/80 relative overflow-hidden">
         <div className="max-w-container-max mx-auto">
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
             <span className="font-['Work_Sans'] font-extrabold text-xs uppercase tracking-wider text-on-surface-variant flex items-center gap-2 mb-3">
-              <span className="w-5 h-0.5 bg-[#c0392b]"></span>
+              <span className="w-5 h-0.5 bg-[#c0392b]" />
               Examiner Insights &amp; Study Vault
             </span>
 
@@ -86,12 +90,12 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* SECTION 1: BLOG ARTICLES */}
+      {/* SECTION 1: BLOG ARTICLES (Rendered via Server Data + Client Filter Island) */}
       <section
         id="articles"
         className="py-16 md:py-24 px-6 max-w-container-max mx-auto scroll-mt-10"
       >
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4 border-b-2 border-line pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-line pb-6 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-6 h-6 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-xs">
@@ -111,150 +115,7 @@ export default function BlogPage() {
           </p>
         </div>
 
-        {/* Featured Article Card */}
-        {featuredArticle && (
-          <div className="bg-primary-container text-on-background rounded-3xl p-7 md:p-12 border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] mb-14 transition-all">
-            <div className="flex flex-wrap items-center gap-2.5 mb-5">
-              <span className="inline-flex items-center gap-1.5 bg-on-background text-white font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-primary-container" />
-                Featured Guide
-              </span>
-              <span className="bg-white/80 border border-line font-['IBM_Plex_Mono'] text-xs font-bold px-3 py-1 rounded-full text-on-background">
-                {featuredArticle.category}
-              </span>
-              <span className="font-['IBM_Plex_Mono'] text-xs text-on-background/70 font-semibold">
-                {featuredArticle.boards}
-              </span>
-            </div>
-
-            <h3 className="font-['Archivo_Black'] text-2xl sm:text-3xl md:text-4xl text-on-background mb-4 leading-tight">
-              {featuredArticle.title}
-            </h3>
-
-            <p className="font-['Work_Sans'] text-sm sm:text-base md:text-lg text-on-background/80 max-w-4xl leading-relaxed mb-6">
-              {featuredArticle.excerpt}
-            </p>
-
-            {/* Highlights bullets */}
-            {featuredArticle.highlights && (
-              <div className="bg-white/70 rounded-2xl p-5 md:p-6 border border-on-background/20 mb-8">
-                <p className="font-['IBM_Plex_Mono'] text-xs uppercase tracking-wider font-bold text-on-background mb-3 flex items-center gap-1.5">
-                  <Bookmark className="w-3.5 h-3.5 text-[#c0392b]" />
-                  What You&apos;ll Learn in This Guide:
-                </p>
-                <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {featuredArticle.highlights.map((h, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-2 font-['Work_Sans'] text-xs text-on-background"
-                    >
-                      <span className="text-[#c0392b] font-bold mt-0.5 shrink-0">
-                        ✓
-                      </span>
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-on-background/20">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-on-background text-white flex items-center justify-center font-bold text-sm font-['IBM_Plex_Mono']">
-                  {featuredArticle.author.charAt(0)}
-                </div>
-                <div>
-                  <span className="font-['Work_Sans'] font-bold text-sm text-on-background block">
-                    {featuredArticle.author}
-                  </span>
-                  <span className="font-['IBM_Plex_Mono'] text-xs text-on-surface-variant">
-                    {featuredArticle.authorRole} • {featuredArticle.readTime}
-                  </span>
-                </div>
-              </div>
-
-              <Link
-                href={`/booking?subject=Economics`}
-                className="bg-on-background text-white font-['Work_Sans'] font-extrabold text-xs sm:text-sm px-7 py-3.5 rounded-full border border-on-background hover:bg-[#c0392b] hover:border-[#c0392b] transition-colors inline-flex items-center gap-2"
-              >
-                <span>Book 1:1 Consultation</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* Regular Articles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-          {regularArticles.map((article) => (
-            <div
-              key={article.id}
-              className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-line hover:border-on-background hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-on-background)] transition-transform duration-200 flex flex-col justify-between"
-            >
-              <div>
-                {/* Meta Header */}
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="font-['IBM_Plex_Mono'] text-[11px] font-bold text-[#c0392b] bg-[#c0392b]/10 px-2.5 py-0.5 rounded-md uppercase">
-                    {article.category}
-                  </span>
-                  <span className="font-['IBM_Plex_Mono'] text-[11px] text-muted flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {article.readTime}
-                  </span>
-                </div>
-
-                <span className="font-['IBM_Plex_Mono'] text-[10px] text-muted block mb-2 font-medium">
-                  Boards: {article.boards}
-                </span>
-
-                <h3 className="font-['Archivo_Black'] text-lg text-on-background mb-3 leading-snug">
-                  {article.title}
-                </h3>
-
-                <p className="font-['Work_Sans'] text-xs sm:text-sm text-on-surface-variant leading-relaxed mb-4">
-                  {article.excerpt}
-                </p>
-
-                {/* Key Takeaways */}
-                {article.highlights && (
-                  <div className="bg-[#f5f2e9]/70 rounded-xl p-3.5 border border-line mb-5">
-                    <ul className="flex flex-col gap-1.5">
-                      {article.highlights.map((h, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-2 font-['Work_Sans'] text-[11px] text-on-background"
-                        >
-                          <span className="text-[#c0392b] font-bold shrink-0">
-                            ✓
-                          </span>
-                          <span className="line-clamp-1">{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              {/* Author & Footer Link */}
-              <div className="pt-4 border-t border-line/60 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <User className="w-3.5 h-3.5 text-muted" />
-                  <span className="font-['Work_Sans'] text-xs font-bold text-on-background truncate max-w-[120px]">
-                    {article.author}
-                  </span>
-                </div>
-
-                <Link
-                  href="/booking"
-                  className="font-['Work_Sans'] font-extrabold text-xs text-[#c0392b] hover:text-on-background inline-flex items-center gap-1 transition-colors"
-                >
-                  <span>Book Consultation</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+        <BlogListSection initialBlogs={blogs} categories={categories} />
       </section>
 
       {/* SECTION 2: FREE REVISION RESOURCES */}
@@ -353,7 +214,7 @@ export default function BlogPage() {
                   </div>
 
                   <Link
-                    href={`/pricing`}
+                    href="/pricing"
                     className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs sm:text-sm py-3.5 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform flex items-center justify-center gap-2 text-center"
                   >
                     <Download className="w-4 h-4 text-on-background" />
