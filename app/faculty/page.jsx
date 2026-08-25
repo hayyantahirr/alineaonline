@@ -11,9 +11,8 @@ import {
   X,
   Calendar,
   Sparkles,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
-import { facultyMembers as fallbackFaculty } from "@/data/facultyData";
 
 // Helper to get initials if image fails or is absent
 function getInitials(name = "") {
@@ -73,7 +72,11 @@ export default function FacultyPage() {
         const data = await res.json();
 
         if (isMounted) {
-          if (data.success && Array.isArray(data.teachers) && data.teachers.length > 0) {
+          if (
+            data.success &&
+            Array.isArray(data.teachers) &&
+            data.teachers.length > 0
+          ) {
             setTeachers(data.teachers);
           } else {
             // Fallback to preconfigured faculty members
@@ -191,16 +194,16 @@ export default function FacultyPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-7">
             {teachers.map((teacher, idx) => {
               const bookingUrl = `/booking?teacher=${encodeURIComponent(
-                teacher.name || ""
+                teacher.name || "",
               )}&subject=${encodeURIComponent(
-                teacher.subjectBookingParam || teacher.subject || ""
+                teacher.subjectBookingParam || teacher.subject || "",
               )}`;
 
               const boardsList = Array.isArray(teacher.boards)
                 ? teacher.boards
                 : typeof teacher.boards === "string" && teacher.boards
-                ? teacher.boards.split(",").map((b) => b.trim())
-                : [];
+                  ? teacher.boards.split(",").map((b) => b.trim())
+                  : [];
 
               return (
                 <div
@@ -337,7 +340,8 @@ export default function FacultyPage() {
                       className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs py-3 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-center"
                     >
                       <span>
-                        Book Session with {(teacher.name || "Teacher").split(" ")[0]}
+                        Book Session with{" "}
+                        {(teacher.name || "Teacher").split(" ")[0]}
                       </span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
@@ -665,8 +669,10 @@ export default function FacultyPage() {
                       {(Array.isArray(selectedTeacher.boards)
                         ? selectedTeacher.boards
                         : typeof selectedTeacher.boards === "string"
-                        ? selectedTeacher.boards.split(",").map((b) => b.trim())
-                        : []
+                          ? selectedTeacher.boards
+                              .split(",")
+                              .map((b) => b.trim())
+                          : []
                       ).map((board, bIdx) => (
                         <span
                           key={bIdx}
@@ -721,18 +727,19 @@ export default function FacultyPage() {
                 </button>
                 <Link
                   href={`/booking?teacher=${encodeURIComponent(
-                    selectedTeacher.name || ""
+                    selectedTeacher.name || "",
                   )}&subject=${encodeURIComponent(
                     selectedTeacher.subjectBookingParam ||
                       selectedTeacher.subject ||
-                      ""
+                      "",
                   )}`}
                   onClick={() => setSelectedTeacher(null)}
                   className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs px-6 py-3 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2 w-full sm:w-auto text-center"
                 >
                   <Calendar className="w-3.5 h-3.5" />
                   <span>
-                    Book Session with {(selectedTeacher.name || "Teacher").split(" ")[0]}
+                    Book Session with{" "}
+                    {(selectedTeacher.name || "Teacher").split(" ")[0]}
                   </span>
                 </Link>
               </div>
