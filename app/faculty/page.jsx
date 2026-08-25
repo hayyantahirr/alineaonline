@@ -11,12 +11,93 @@ import {
   X,
   Calendar,
   Sparkles,
-  ExternalLink,
+  ExternalLink
 } from "lucide-react";
-import { facultyMembers } from "@/data/facultyData";
+import { facultyMembers as fallbackFaculty } from "@/data/facultyData";
+
+// Helper to get initials if image fails or is absent
+function getInitials(name = "") {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+// Resilient Teacher Avatar Component
+function TeacherAvatar({
+  src,
+  alt,
+  priority = false,
+  className = "",
+  sizes = "(max-width: 768px) 80px, 96px",
+}) {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src || hasError) {
+    return (
+      <div className="w-full h-full bg-[#191c1d] flex items-center justify-center text-primary-container font-['Archivo_Black'] text-lg md:text-xl select-none">
+        {getInitials(alt)}
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt || "Teacher Profile"}
+      fill
+      priority={priority}
+      sizes={sizes}
+      className={`object-cover ${className}`}
+      onError={() => setHasError(true)}
+    />
+  );
+}
 
 export default function FacultyPage() {
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+
+  // Fetch teachers from dedicated API route
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchTeachers() {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/teachers");
+        if (!res.ok) throw new Error("Failed to load faculty");
+        const data = await res.json();
+
+        if (isMounted) {
+          if (data.success && Array.isArray(data.teachers) && data.teachers.length > 0) {
+            setTeachers(data.teachers);
+          } else {
+            // Fallback to preconfigured faculty members
+            setTeachers(fallbackFaculty);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching teachers:", err);
+        if (isMounted) {
+          setTeachers(fallbackFaculty);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchTeachers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Close modal on Escape key press and handle body scroll lock
   useEffect(() => {
@@ -40,7 +121,7 @@ export default function FacultyPage() {
   }, [selectedTeacher]);
 
   return (
-    <div className="w-full bg-[#faf8f2] text-on-background min-h-screen grain-bg">
+    <div className="w-full bg-[#faf8f2] text-on-background min-h-screen">
       {/* Page Header */}
       <section className="bg-on-background text-white py-14 md:py-18 px-6 border-b-4 border-primary-container">
         <div className="max-w-container-max mx-auto text-center">
@@ -76,163 +157,196 @@ export default function FacultyPage() {
           </p>
         </div>
 
-        {/* Unified Faculty Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-7">
-          {facultyMembers.map((teacher, idx) => {
-            const bookingUrl = `/booking?teacher=${encodeURIComponent(
-              teacher.name,
-            )}&subject=${encodeURIComponent(
-              teacher.subjectBookingParam || teacher.subject,
-            )}`;
-
-            return (
+        {/* Loading Skeleton */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-7">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
               <div
-                key={teacher.id}
-                className="bg-white rounded-2xl border-2 border-line hover:border-on-background hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-on-background)] transition-transform duration-200 flex flex-col justify-between overflow-hidden group"
+                key={n}
+                className="bg-white rounded-2xl border-2 border-line p-6 flex flex-col justify-between animate-pulse"
               >
-                <div
-                  onClick={() => setSelectedTeacher(teacher)}
-                  className="cursor-pointer"
-                >
-                  {/* Card Header: Photo + Core Info */}
-                  <div className="p-5 md:p-6 pb-4">
-                    <div className="flex items-start gap-4">
-                      {/* Photo Thumbnail */}
-                      <div
-                        onClick={() => setSelectedTeacher(teacher)}
-                        className="w-20 h-20 md:w-section-v-desktop md:h-section-v-desktop rounded-2xl overflow-hidden border-2 border-line shrink-0 group-hover:border-on-background transition-colors cursor-pointer relative"
-                      >
-                        <Image
-                          src={teacher.image}
-                          alt={teacher.name}
-                          fill
-                          priority={idx < 3}
-                          sizes="(max-width: 768px) 80px, 120px"
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-
-                      {/* Name, Role & Status */}
-                      <div className="flex flex-col min-w-0 flex-1">
-                        {/* Availability Pill */}
-                        <div className="mb-1.5">
-                          <span
-                            className={`inline-flex items-center gap-1.5 font-['IBM_Plex_Mono'] text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                              teacher.availabilityStatus === "available"
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-300"
-                                : "bg-amber-50 text-amber-800 border-amber-300"
-                            }`}
-                          >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                teacher.availabilityStatus === "available"
-                                  ? "bg-emerald-500 animate-pulse"
-                                  : "bg-amber-500"
-                              }`}
-                            />
-                            {teacher.availability}
-                          </span>
-                        </div>
-
-                        <h3
-                          onClick={() => setSelectedTeacher(teacher)}
-                          className="font-['Archivo_Black'] text-lg text-on-background truncate hover:text-[#c0392b] transition-colors cursor-pointer"
-                        >
-                          {teacher.name}
-                        </h3>
-
-                        <p className="font-['Work_Sans'] text-xs text-[#c0392b] font-bold truncate">
-                          {teacher.role}
-                        </p>
-
-                        {teacher.qualification && (
-                          <span className="font-['IBM_Plex_Mono'] text-[11px] text-on-surface-variant mt-1 flex items-center gap-1 truncate">
-                            <GraduationCap className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">
-                              {teacher.qualification}
-                            </span>
-                          </span>
-                        )}
-                      </div>
+                <div>
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-20 h-20 rounded-2xl bg-surface-container-low shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="w-24 h-4 bg-surface-container-low rounded" />
+                      <div className="w-36 h-6 bg-surface-container-low rounded" />
+                      <div className="w-28 h-4 bg-surface-container-low rounded" />
                     </div>
                   </div>
-
-                  {/* Card Specs Grid */}
-                  <div className="px-5 md:px-6 pb-4">
-                    <div className="bg-[#f5f2e9]/70 rounded-xl p-3.5 border border-line">
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
-                            Subject
-                          </span>
-                          <span className="font-['Work_Sans'] font-bold text-xs text-on-background line-clamp-1">
-                            {teacher.subject}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
-                            Levels
-                          </span>
-                          <span className="font-['Work_Sans'] font-bold text-xs text-on-background line-clamp-1">
-                            {teacher.levels}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
-                            Experience
-                          </span>
-                          <span className="font-['Work_Sans'] font-bold text-xs text-on-background">
-                            {teacher.experience}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Exam Boards */}
-                    <div className="flex flex-wrap items-center gap-1.5 mt-3">
-                      <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant mr-0.5">
-                        Boards:
-                      </span>
-                      {teacher.boards.map((board) => (
-                        <span
-                          key={board}
-                          className="font-['IBM_Plex_Mono'] text-[10px] font-bold px-2 py-0.5 rounded-md border border-line bg-surface-container-low text-on-background"
-                        >
-                          {board}
-                        </span>
-                      ))}
+                  <div className="bg-[#f5f2e9]/70 rounded-xl p-4 space-y-2 mb-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="h-8 bg-surface-container-low rounded" />
+                      <div className="h-8 bg-surface-container-low rounded" />
+                      <div className="h-8 bg-surface-container-low rounded" />
                     </div>
                   </div>
                 </div>
-
-                {/* Card Footer Actions */}
-                <div className="p-5 md:p-6 pt-3 border-t border-line/60 bg-[#fbf9f4]/40 flex flex-col gap-2.5">
-                  <div className="flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedTeacher(teacher)}
-                      className="font-['Work_Sans'] font-bold text-xs text-on-surface-variant hover:text-on-background inline-flex items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      View Profile &amp; Bio
-                      <ExternalLink className="w-3 h-3" />
-                    </button>
-                    <span className="font-['IBM_Plex_Mono'] text-[10px] text-muted">
-                      1:1 &amp; Group
-                    </span>
-                  </div>
-
-                  <Link
-                    href={bookingUrl}
-                    className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs py-3 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-center"
-                  >
-                    <span>Book Session with {teacher.name.split(" ")[0]}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
+                <div className="h-10 bg-surface-container-low rounded-full mt-4" />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          /* Unified Faculty Cards Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-7">
+            {teachers.map((teacher, idx) => {
+              const bookingUrl = `/booking?teacher=${encodeURIComponent(
+                teacher.name || ""
+              )}&subject=${encodeURIComponent(
+                teacher.subjectBookingParam || teacher.subject || ""
+              )}`;
+
+              const boardsList = Array.isArray(teacher.boards)
+                ? teacher.boards
+                : typeof teacher.boards === "string" && teacher.boards
+                ? teacher.boards.split(",").map((b) => b.trim())
+                : [];
+
+              return (
+                <div
+                  key={teacher.id || idx}
+                  className="bg-white rounded-2xl border-2 border-line hover:border-on-background hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-on-background)] transition-transform duration-200 flex flex-col justify-between overflow-hidden group"
+                >
+                  <div
+                    onClick={() => setSelectedTeacher(teacher)}
+                    className="cursor-pointer"
+                  >
+                    {/* Card Header: Photo + Core Info */}
+                    <div className="p-5 md:p-6 pb-4">
+                      <div className="flex items-start gap-4">
+                        {/* Photo Thumbnail */}
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-line shrink-0 group-hover:border-on-background transition-colors cursor-pointer relative bg-surface-container-low">
+                          <TeacherAvatar
+                            src={teacher.image}
+                            alt={teacher.name}
+                            priority={idx < 3}
+                            className="group-hover:scale-105 transition-transform duration-200"
+                          />
+                        </div>
+
+                        {/* Name, Role & Status */}
+                        <div className="flex flex-col min-w-0 flex-1">
+                          {/* Availability Pill */}
+                          <div className="mb-1.5">
+                            <span
+                              className={`inline-flex items-center gap-1.5 font-['IBM_Plex_Mono'] text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                teacher.availabilityStatus === "available"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                  : "bg-amber-50 text-amber-800 border-amber-300"
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  teacher.availabilityStatus === "available"
+                                    ? "bg-emerald-500"
+                                    : "bg-amber-500"
+                                }`}
+                              />
+                              {teacher.availability || "Accepting Students"}
+                            </span>
+                          </div>
+
+                          <h3 className="font-['Archivo_Black'] text-lg text-on-background truncate hover:text-[#c0392b] transition-colors">
+                            {teacher.name}
+                          </h3>
+
+                          <p className="font-['Work_Sans'] text-xs text-[#c0392b] font-bold truncate">
+                            {teacher.role}
+                          </p>
+
+                          {teacher.qualification && (
+                            <span className="font-['IBM_Plex_Mono'] text-[11px] text-on-surface-variant mt-1 flex items-center gap-1 truncate">
+                              <GraduationCap className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate">
+                                {teacher.qualification}
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Specs Grid */}
+                    <div className="px-5 md:px-6 pb-4">
+                      <div className="bg-[#f5f2e9]/70 rounded-xl p-3.5 border border-line">
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
+                              Subject
+                            </span>
+                            <span className="font-['Work_Sans'] font-bold text-xs text-on-background line-clamp-1">
+                              {teacher.subject}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
+                              Levels
+                            </span>
+                            <span className="font-['Work_Sans'] font-bold text-xs text-on-background line-clamp-1">
+                              {teacher.levels || "IGCSE / A-Level"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant block mb-0.5">
+                              Experience
+                            </span>
+                            <span className="font-['Work_Sans'] font-bold text-xs text-on-background">
+                              {teacher.experience || "5+ Years"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Exam Boards */}
+                      {boardsList.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                          <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant mr-0.5">
+                            Boards:
+                          </span>
+                          {boardsList.map((board, bIdx) => (
+                            <span
+                              key={bIdx}
+                              className="font-['IBM_Plex_Mono'] text-[10px] font-bold px-2 py-0.5 rounded-md border border-line bg-surface-container-low text-on-background"
+                            >
+                              {board}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card Footer Actions */}
+                  <div className="p-5 md:p-6 pt-3 border-t border-line/60 bg-[#fbf9f4]/40 flex flex-col gap-2.5">
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTeacher(teacher)}
+                        className="font-['Work_Sans'] font-bold text-xs text-on-surface-variant hover:text-on-background inline-flex items-center gap-1 transition-colors cursor-pointer"
+                      >
+                        View Profile &amp; Bio
+                        <ExternalLink className="w-3 h-3" />
+                      </button>
+                      <span className="font-['IBM_Plex_Mono'] text-[10px] text-muted">
+                        1:1 &amp; Group
+                      </span>
+                    </div>
+
+                    <Link
+                      href={bookingUrl}
+                      className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs py-3 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-center"
+                    >
+                      <span>
+                        Book Session with {(teacher.name || "Teacher").split(" ")[0]}
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Teaching Standards & Hiring Rigor */}
@@ -436,7 +550,7 @@ export default function FacultyPage() {
 
       {/* Teacher Full Profile Modal */}
       {selectedTeacher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 md:bg-black/60 md:backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60">
           {/* Backdrop Click to Close */}
           <div
             className="absolute inset-0"
@@ -448,13 +562,12 @@ export default function FacultyPage() {
             {/* Modal Header */}
             <div className="p-6 md:p-8 pb-5 border-b border-line flex items-start justify-between gap-4 bg-white shrink-0">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 border-line shrink-0 relative">
-                  <Image
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 border-line shrink-0 relative bg-surface-container-low">
+                  <TeacherAvatar
                     src={selectedTeacher.image}
                     alt={selectedTeacher.name}
-                    fill
+                    priority={true}
                     sizes="(max-width: 768px) 64px, 80px"
-                    className="object-cover"
                   />
                 </div>
                 <div>
@@ -473,7 +586,7 @@ export default function FacultyPage() {
                             : "bg-amber-500"
                         }`}
                       />
-                      {selectedTeacher.availability}
+                      {selectedTeacher.availability || "Accepting Students"}
                     </span>
                   </div>
                   <h3 className="font-['Archivo_Black'] text-xl md:text-2xl text-on-background">
@@ -530,7 +643,7 @@ export default function FacultyPage() {
                       Target Levels
                     </span>
                     <strong className="font-['Work_Sans'] text-sm text-on-background block">
-                      {selectedTeacher.levels}
+                      {selectedTeacher.levels || "IGCSE / A-Level"}
                     </strong>
                   </div>
                   <div>
@@ -538,26 +651,33 @@ export default function FacultyPage() {
                       Teaching Experience
                     </span>
                     <strong className="font-['Work_Sans'] text-sm text-on-background block">
-                      {selectedTeacher.experience}
+                      {selectedTeacher.experience || "5+ Years"}
                     </strong>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-line/60 flex items-center gap-2">
-                  <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant">
-                    Exam Boards:
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedTeacher.boards.map((board) => (
-                      <span
-                        key={board}
-                        className="font-['IBM_Plex_Mono'] text-xs font-bold px-2.5 py-0.5 rounded-lg border border-on-background bg-primary-container text-on-background"
-                      >
-                        {board}
-                      </span>
-                    ))}
+                {selectedTeacher.boards && (
+                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center gap-2">
+                    <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-wider text-on-surface-variant">
+                      Exam Boards:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(Array.isArray(selectedTeacher.boards)
+                        ? selectedTeacher.boards
+                        : typeof selectedTeacher.boards === "string"
+                        ? selectedTeacher.boards.split(",").map((b) => b.trim())
+                        : []
+                      ).map((board, bIdx) => (
+                        <span
+                          key={bIdx}
+                          className="font-['IBM_Plex_Mono'] text-xs font-bold px-2.5 py-0.5 rounded-lg border border-on-background bg-primary-container text-on-background"
+                        >
+                          {board}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Teaching Highlights */}
@@ -601,17 +721,18 @@ export default function FacultyPage() {
                 </button>
                 <Link
                   href={`/booking?teacher=${encodeURIComponent(
-                    selectedTeacher.name,
+                    selectedTeacher.name || ""
                   )}&subject=${encodeURIComponent(
                     selectedTeacher.subjectBookingParam ||
-                      selectedTeacher.subject,
+                      selectedTeacher.subject ||
+                      ""
                   )}`}
                   onClick={() => setSelectedTeacher(null)}
                   className="bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs px-6 py-3 rounded-full border-2 border-on-background neo-brutalist-shadow transition-transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2 w-full sm:w-auto text-center"
                 >
                   <Calendar className="w-3.5 h-3.5" />
                   <span>
-                    Book Session with {selectedTeacher.name.split(" ")[0]}
+                    Book Session with {(selectedTeacher.name || "Teacher").split(" ")[0]}
                   </span>
                 </Link>
               </div>
