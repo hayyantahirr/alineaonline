@@ -114,7 +114,7 @@ export default function BlogListSection({ initialBlogs = [], categories = ["All"
             <div className="bg-white rounded-3xl border-2 border-on-background shadow-[8px_8px_0_0_var(--color-on-background)] mb-14 overflow-hidden group hover:-translate-y-0.5 transition-all duration-200">
               <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
                 {/* Left Image */}
-                <div className="lg:col-span-6 relative min-h-70 sm:min-h-[340px] lg:min-h-[420px] bg-surface-container-low overflow-hidden">
+                <div className="lg:col-span-6 relative min-h-70 sm:min-h-85 lg:min-h-105surface-container-low overflow-hidden">
                   {featuredArticle.featuredImage ? (
                     <Image
                       src={featuredArticle.featuredImage}
@@ -125,7 +125,7 @@ export default function BlogListSection({ initialBlogs = [], categories = ["All"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#191c1d] to-[#3a3f45] flex items-center justify-center p-8 text-center text-[#ffd400]">
+                    <div className="w-full h-full bg-linear-to-br from-[#191c1d] to-ink-soft flex items-center justify-center p-8 text-center text-primary-container">
                       <BookOpen className="w-16 h-16 opacity-60" />
                     </div>
                   )}
@@ -231,7 +231,7 @@ export default function BlogListSection({ initialBlogs = [], categories = ["All"
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#191c1d] to-[#3a3f45] flex items-center justify-center text-[#ffd400]">
+                        <div className="w-full h-full bg-linear-to-br from-[#191c1d] to-ink-soft flex items-center justify-center text-primary-container">
                           <BookOpen className="w-10 h-10 opacity-40" />
                         </div>
                       )}
