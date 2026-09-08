@@ -3,9 +3,9 @@ export default function TrustStrip() {
     "Trusted in Dubai",
     "Trusted in Riyadh",
     "Trusted in Doha",
+    "Trusted in Muscat",
     "Trusted in Singapore",
-    "Trusted in Kuala Lumpur",
-    "Trusted in London",
+    "Trusted in Hong Kong",
   ];
 
   return (

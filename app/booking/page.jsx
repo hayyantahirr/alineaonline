@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
@@ -14,13 +14,26 @@ import {
   BookOpen,
   AlertCircle,
   Loader2,
+  Calculator,
+  CreditCard,
+  Globe2,
 } from "lucide-react";
+import {
+  COUNTRIES,
+  HOURLY_RATES,
+  BOOKING_STEPS_FLOW,
+  formatPrice,
+  convertPrice,
+  getCountryByCode,
+  detectCountryFromTimezone,
+} from "@/constants/currencies";
 
 function BookingContent() {
   const searchParams = useSearchParams();
   const teacherParam = searchParams.get("teacher");
   const subjectParam = searchParams.get("subject");
   const levelParam = searchParams.get("level");
+  const hoursParam = searchParams.get("hours");
 
   const [teachers, setTeachers] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -34,12 +47,55 @@ function BookingContent() {
   const [selectedBoardLabel, setSelectedBoardLabel] =
     useState("Edexcel (Pearson)");
 
-  const [selectedFormat, setSelectedFormat] = useState(
-    "1:1 Intensive Mentorship",
+  const [selectedHours, setSelectedHours] = useState(
+    hoursParam ? parseInt(hoursParam, 10) || 5 : 5,
   );
+  const [selectedCountryCode, setSelectedCountryCode] = useState("AE");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(
     "4:00 PM - 5:30 PM GST (Dubai)",
   );
+
+  // Auto-detect country for currency localization
+  useEffect(() => {
+    let isMounted = true;
+    async function detectGeo() {
+      try {
+        const res = await fetch("/api/geo");
+        const data = await res.json();
+        if (isMounted && data.success && data.country) {
+          const matched = getCountryByCode(data.country);
+          if (matched && matched.code !== "OTHER") {
+            setSelectedCountryCode(matched.code);
+            return;
+          }
+        }
+      } catch (err) {}
+      if (isMounted) {
+        const tz = detectCountryFromTimezone();
+        if (tz && tz !== "OTHER") setSelectedCountryCode(tz);
+      }
+    }
+    detectGeo();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const selectedCountry = useMemo(
+    () => getCountryByCode(selectedCountryCode),
+    [selectedCountryCode],
+  );
+
+  const isIGCSE =
+    (selectedLevelLabel || "").toLowerCase().includes("igcse") ||
+    (selectedLevelLabel || "").toLowerCase().includes("gcse") ||
+    (selectedLevelLabel || "").toLowerCase().includes("o-level");
+  const activeRateObj = isIGCSE ? HOURLY_RATES.IGCSE : HOURLY_RATES.A_LEVEL;
+  const hourlyRateUSD = activeRateObj.rateUSD;
+  const totalUSD = hourlyRateUSD * selectedHours;
+
+  const formattedHourlyRate = formatPrice(hourlyRateUSD, selectedCountry);
+  const formattedTotalPrice = formatPrice(totalUSD, selectedCountry);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -236,7 +292,7 @@ function BookingContent() {
         examBoard: selectedBoardLabel,
         teacherName: selectedTeacher?.name || "Unassigned Specialist",
         teacherRole: selectedTeacher?.role || "Subject Specialist",
-        sessionFormat: selectedFormat,
+        sessionFormat: `${selectedHours} Hours (${formattedTotalPrice}) — 1:1 Tuition (${selectedLevelLabel})`,
         timeSlot: selectedTimeSlot,
         targetGrade: formData.targetGrade || "A*",
         additionalNotes: formData.additionalNotes || "",
@@ -311,9 +367,9 @@ function BookingContent() {
               senior academic coordinator will reach out to you via WhatsApp /
               email within <strong>2 hours</strong> to confirm your{" "}
               <strong>
-                {selectedSubject?.title} ({selectedLevelLabel})
+                {selectedHours} Hours of {selectedSubject?.title} ({selectedLevelLabel})
               </strong>{" "}
-              session slot with <strong>{selectedTeacher?.name}</strong>.
+              tuition with <strong>{selectedTeacher?.name}</strong> and provide your hosted Alfa Payment Gateway link.
             </p>
 
             <div className="bg-white/80 rounded-2xl p-5 border border-on-background mb-6 text-left font-['Work_Sans'] text-xs text-on-surface-variant space-y-2">
@@ -326,7 +382,13 @@ function BookingContent() {
                 Exam Board: {selectedBoardLabel}{" "}
                 {activeBoardObj?.syllabus ? `(${activeBoardObj.syllabus})` : ""}
               </p>
-              <p className="text-muted pt-1">No payment is required today.</p>
+              <p className="flex items-center gap-2 text-on-background font-bold">
+                <CreditCard className="w-4 h-4 text-[#c0392b]" />
+                Estimated Total: {formattedTotalPrice} ({selectedHours} hrs @ {formattedHourlyRate}/hr)
+              </p>
+              <p className="text-muted pt-1">
+                Hosted Alfa checkout link will be delivered for secure card payment (no account needed).
+              </p>
             </div>
 
             <button
@@ -518,68 +580,52 @@ function BookingContent() {
                   </div>
                 )}
 
-                {/* Step 3: Session Format */}
+                {/* Step 3: Hours & Flat Rate Selection */}
                 <div>
-                  <label className="block font-['Archivo_Black'] text-lg text-on-background mb-3">
-                    2. Choose Mentorship Format
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {[
-                      {
-                        title: "1:1 Intensive Mentorship",
-                        badge: "POPULAR",
-                        desc: "Dedicated senior specialist tailored to student's exact syllabus.",
-                      },
-                      {
-                        title: "Small Group Masterclass (Max 4)",
-                        badge: "INTERACTIVE",
-                        desc: "Collaborative problem-solving with peers at matching target grades.",
-                      },
-                      {
-                        title: "Diagnostic Exam Assessment",
-                        badge: "TRIAL",
-                        desc: "Full syllabus gap-analysis and benchmark grade prediction.",
-                      },
-                    ].map((fmt) => {
-                      const isSelected = selectedFormat === fmt.title;
-                      return (
-                        <div
-                          key={fmt.title}
-                          onClick={() => setSelectedFormat(fmt.title)}
-                          className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
-                            isSelected
-                              ? "bg-on-background text-white border-on-background shadow-[4px_4px_0_0_var(--color-primary-container)]"
-                              : "bg-[#faf8f2] border-line text-on-background hover:border-on-background/40"
-                          }`}
-                        >
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span
-                                className={`font-['IBM_Plex_Mono'] text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                                  isSelected
-                                    ? "bg-primary-container text-on-background border-primary-container"
-                                    : "bg-surface-container border-line text-on-surface-variant"
-                                }`}
-                              >
-                                {fmt.badge}
-                              </span>
-                            </div>
-                            <h5 className="font-['Archivo_Black'] text-sm mb-1.5 leading-snug">
-                              {fmt.title}
-                            </h5>
-                            <p
-                              className={`font-['Work_Sans'] text-xs leading-relaxed ${
-                                isSelected
-                                  ? "text-surface-variant"
-                                  : "text-on-surface-variant"
-                              }`}
-                            >
-                              {fmt.desc}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block font-['Archivo_Black'] text-lg text-on-background">
+                      2. Number of Hours ({formattedHourlyRate}/hr)
+                    </label>
+                    <span className="font-['Archivo_Black'] text-sm text-[#c0392b]">
+                      Total: {formattedTotalPrice}
+                    </span>
+                  </div>
+
+                  {/* Hours quick buttons */}
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-3">
+                    {[1, 2, 5, 10, 15, 20].map((h) => (
+                      <button
+                        key={h}
+                        type="button"
+                        onClick={() => setSelectedHours(h)}
+                        className={`py-3 px-2 rounded-xl font-['IBM_Plex_Mono'] font-bold text-xs border-2 text-center transition-all cursor-pointer ${
+                          selectedHours === h
+                            ? "bg-on-background text-white border-on-background neo-brutalist-shadow"
+                            : "bg-[#faf8f2] text-on-surface-variant border-line hover:border-on-background/40"
+                        }`}
+                      >
+                        {h} {h === 1 ? "Hour" : "Hours"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Range Slider */}
+                  <div className="bg-[#faf8f2] p-4 rounded-xl border-2 border-line">
+                    <div className="flex items-center justify-between text-xs font-['Work_Sans'] font-semibold text-on-surface-variant mb-2">
+                      <span>Custom Commitment:</span>
+                      <span className="font-bold text-on-background font-['IBM_Plex_Mono']">
+                        {selectedHours} Hours • {formattedTotalPrice}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="40"
+                      step="1"
+                      value={selectedHours}
+                      onChange={(e) => setSelectedHours(parseInt(e.target.value, 10))}
+                      className="w-full accent-on-background cursor-pointer"
+                    />
                   </div>
                 </div>
 
@@ -809,26 +855,30 @@ function BookingContent() {
                   </div>
                   <div>
                     <span className="text-xs text-on-surface-variant block mb-0.5">
-                      Mentorship Format
+                      Tuition Hours &amp; Estimated Total
                     </span>
-                    <strong className="text-on-background text-xs">
-                      {selectedFormat}
+                    <strong className="text-on-background text-sm font-['IBM_Plex_Mono']">
+                      {selectedHours} Hours • {formattedTotalPrice}
                     </strong>
+                    <span className="text-xs text-muted block">
+                      ({formattedHourlyRate} / hr • {selectedCountry.currency})
+                    </span>
                   </div>
                 </div>
 
+                {/* 5-Step Alfa Payment Gateway flow notice */}
                 <div className="space-y-3 font-['Work_Sans'] text-xs text-on-surface-variant">
                   <div className="flex items-center gap-2 text-emerald-800 font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                    Examiner-Report-Driven Mark-Scheme Teaching
+                    <CreditCard className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Hosted Alfa Payment Gateway Link</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-on-background" />
-                    Direct Academic Oversight by Founders
+                    <span className="w-2 h-2 rounded-full bg-on-background shrink-0" />
+                    <span>Pay securely by credit/debit card (no account needed)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-on-background" />
-                    Diagnostic Syllabus Gap-Analysis Included
+                    <span className="w-2 h-2 rounded-full bg-on-background shrink-0" />
+                    <span>Instant on-screen &amp; email confirmation</span>
                   </div>
                 </div>
               </div>

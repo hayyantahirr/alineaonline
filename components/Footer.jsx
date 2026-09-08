@@ -56,7 +56,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://wa.me/+923322348565"
+                href="https://wa.me/971542632026?text=Hello%20Alinea%20Academic%20Team%2C%20I%20would%20like%20to%20inquire%20about%20tutoring%20sessions."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-surface-variant hover:text-success hover:border-success/50 hover:bg-success/10 transition-all duration-200"
@@ -116,7 +116,7 @@ export default function Footer() {
               directly via WhatsApp or schedule a call.
             </p>
             <a
-              href="https://wa.me/+923322348565"
+              href="https://wa.me/971542632026?text=Hello%20Alinea%20Academic%20Team%2C%20I%20would%20like%20to%20inquire%20about%20tutoring%20sessions."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2.5 bg-success text-white font-['Work_Sans'] font-bold text-sm px-6 py-3.5 rounded-full border-2 border-success hover:bg-success-dark hover:border-success-dark transition-all duration-200 shadow-lg shadow-success/20 hover:shadow-success/40 hover:-translate-y-0.5 w-max"

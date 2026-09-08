@@ -208,9 +208,11 @@ export default async function BlogPage() {
                 <div className="pt-4 border-t border-line/60 flex flex-col gap-3">
                   <div className="flex items-center justify-between text-[11px] font-['IBM_Plex_Mono'] text-muted">
                     <span>{resource.format}</span>
-                    <span className="text-emerald-700 font-semibold">
-                      {resource.downloadsCount}
-                    </span>
+                    {resource.downloadsCount && (
+                      <span className="text-emerald-700 font-semibold">
+                        {resource.downloadsCount}
+                      </span>
+                    )}
                   </div>
 
                   <Link
@@ -218,7 +220,7 @@ export default async function BlogPage() {
                     className="w-full bg-primary-container text-on-background font-['Work_Sans'] font-extrabold text-xs sm:text-sm py-3.5 rounded-full border-2 border-on-background neo-brutalist-shadow hover:-translate-y-0.5 transition-transform flex items-center justify-center gap-2 text-center"
                   >
                     <Download className="w-4 h-4 text-on-background" />
-                    <span>Get Access via Diagnostic Pack</span>
+                    <span>Download Revision Pack</span>
                   </Link>
                 </div>
               </div>

@@ -5,7 +5,12 @@ export default function Stats() {
     { number: "6", label: "Years Excellence", hasCircle: false },
     { number: "200+", label: "Alumni Worldwide", hasCircle: true },
     { number: "5", label: "Countries Served", hasCircle: false },
-    { number: "2", label: "Exam Boards", hasCircle: false },
+    {
+      number: "5",
+      label: "Exam Boards",
+      sublabel: "(Edexcel, AQA, CAIE, OCR, IB)",
+      hasCircle: false,
+    },
   ];
 
   return (
@@ -61,28 +66,36 @@ export default function Stats() {
             <span className="font-['Work_Sans'] font-extrabold text-xs md:text-sm text-on-surface-variant uppercase tracking-widest mt-3">
               {stat.label}
             </span>
+            {stat.sublabel && (
+              <span className="font-['IBM_Plex_Mono'] text-[10px] text-muted tracking-tight mt-1">
+                {stat.sublabel}
+              </span>
+            )}
           </div>
         ))}
       </div>
 
       {/* Verification Tags */}
-      <div className="flex flex-wrap justify-center gap-4 relative z-10 pt-4">
-        <div className="px-5 py-2.5 rounded-full border-2 border-on-background bg-white flex items-center gap-3 shadow-sm hover:-translate-y-0.5 transition-transform cursor-pointer">
-          <div className="w-5 h-5 rounded-full bg-on-background flex items-center justify-center shrink-0">
-            <Check className="w-3 h-3 text-primary-container stroke-3" />
+      <div className="flex flex-wrap justify-center gap-3 relative z-10 pt-4">
+        {[
+          "Pearson Edexcel",
+          "AQA",
+          "Cambridge (CAIE)",
+          "OCR",
+          "IB Diploma",
+        ].map((board) => (
+          <div
+            key={board}
+            className="px-4 py-2 rounded-full border-2 border-on-background bg-white flex items-center gap-2.5 shadow-sm hover:-translate-y-0.5 transition-transform"
+          >
+            <div className="w-4 h-4 rounded-full bg-on-background flex items-center justify-center shrink-0">
+              <Check className="w-2.5 h-2.5 text-primary-container stroke-3" />
+            </div>
+            <span className="font-['Work_Sans'] font-bold text-xs sm:text-sm text-on-background">
+              {board}
+            </span>
           </div>
-          <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
-            Cambridge Assessment International Education
-          </span>
-        </div>
-        <div className="px-5 py-2.5 rounded-full border-2 border-on-background bg-white flex items-center gap-3 shadow-sm hover:-translate-y-0.5 transition-transform cursor-pointer">
-          <div className="w-5 h-5 rounded-full bg-on-background flex items-center justify-center shrink-0">
-            <Check className="w-3 h-3 text-primary-container stroke-3" />
-          </div>
-          <span className="font-['Work_Sans'] font-bold text-sm text-on-background">
-            Pearson Edexcel
-          </span>
-        </div>
+        ))}
       </div>
     </section>
   );

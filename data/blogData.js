@@ -34,7 +34,7 @@ export const freeResources = [
   },
   {
     id: "igcse-vocab-sheet",
-    title: "IGCSE & O-Level Economics Mark Scheme Vocabulary Cheat Sheet",
+    title: "IGCSE & GCSE Economics Mark Scheme Vocabulary Cheat Sheet",
     subject: "Economics",
     boards: "Cambridge 0455 • Edexcel 4EC1",
     format: "PDF Quick Reference",
@@ -66,7 +66,7 @@ export const freeResources = [
   },
   {
     id: "physics-practical-guide",
-    title: "Physics Alternative to Practical (Paper 3 & Paper 5) Technique Guide",
+    title: "Paper 3 & Paper 5 Technique Guide (Physics Alternative to Practical)",
     subject: "Physics",
     boards: "CAIE 9702 • Edexcel IAL",
     format: "PDF Lab Workbook",

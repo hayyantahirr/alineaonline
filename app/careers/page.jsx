@@ -13,6 +13,7 @@ import {
   Loader2,
   ArrowDown,
   Sparkles,
+  MessageCircle,
 } from "lucide-react";
 import TeacherRubricVisual from "@/components/careers/TeacherRubricVisual";
 
@@ -45,13 +46,12 @@ export default function CareersPage() {
   const cvInputRef = useRef(null);
 
   const presetBoards = [
-    "Cambridge (CAIE)",
     "Edexcel (Pearson)",
     "AQA",
+    "Cambridge (CAIE)",
     "OCR",
-    "IB (International Baccalaureate)",
-    "AP (Advanced Placement)",
-    "WJEC / Eduqas",
+    "IB",
+    "AP",
   ];
 
   const presetSlots = [
@@ -355,6 +355,19 @@ export default function CareersPage() {
                 Back to Home
               </Link>
             </div>
+            <div className="mt-8 pt-6 border-t border-line text-xs font-['Work_Sans'] text-on-surface-variant">
+              <p>
+                Have questions regarding your application? Message Teacher Recruitment directly on WhatsApp:{" "}
+                <a
+                  href="https://wa.me/923322348565?text=Hello%20Alinea%20Recruitment%2C%20I%20have%20submitted%20my%20application."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-success hover:underline font-['IBM_Plex_Mono']"
+                >
+                  +92 332 2348565
+                </a>
+              </p>
+            </div>
           </div>
         </section>
       </div>
@@ -433,6 +446,15 @@ export default function CareersPage() {
                   className="bg-white/80 hover:bg-white text-on-background font-['Work_Sans'] font-extrabold text-sm px-6 py-3.5 rounded-full border-2 border-on-background transition-colors duration-200"
                 >
                   View Requirements
+                </a>
+                <a
+                  href="https://wa.me/923322348565?text=Hello%20Alinea%20Recruitment%2C%20I%20am%20inquiring%20regarding%20teacher%20career%20opportunities."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-transparent text-on-background font-['Work_Sans'] font-bold text-sm px-5 py-3.5 rounded-full border-2 border-on-background hover:bg-white/60 transition-colors duration-200 inline-flex items-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                  <span>Applicant WhatsApp</span>
                 </a>
               </div>
             </div>
@@ -1186,6 +1208,24 @@ export default function CareersPage() {
                   By submitting, you agree to Alinea&apos;s recruitment terms.
                   We&apos;ll only use your data for the hiring process.
                 </p>
+                <div className="mt-4 pt-4 border-t border-line flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-[#faf8f2] p-4 rounded-2xl border">
+                  <div>
+                    <p className="font-['Work_Sans'] font-bold text-xs text-on-background">
+                      Questions about teaching with Alinea?
+                    </p>
+                    <p className="font-['IBM_Plex_Mono'] text-[11px] text-muted">
+                      Strictly for applicant inquiries: Teacher Recruitment
+                    </p>
+                  </div>
+                  <a
+                    href="https://wa.me/923322348565?text=Hello%20Alinea%20Recruitment%2C%20I%20am%20inquiring%20regarding%20teacher%20career%20opportunities."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#25D366] text-white font-['Work_Sans'] font-bold text-xs px-4 py-2.5 rounded-full shadow hover:scale-105 transition-transform"
+                  >
+                    <span>WhatsApp +92 332 2348565</span>
+                  </a>
+                </div>
               </div>
             </form>
           </div>
