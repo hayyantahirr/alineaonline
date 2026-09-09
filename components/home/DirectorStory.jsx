@@ -62,10 +62,10 @@ export default function DirectorStory() {
             </li>
           </ul>
           <Link
-            href="/subjects"
+            href="/faculty"
             className="font-['Work_Sans'] font-bold text-on-background border-b-2 border-on-background w-max pb-1 mt-2 hover:text-[#c0392b] transition-colors text-sm"
           >
-            Read the full story →
+            Meet our teaching faculty →
           </Link>
         </div>
       </div>

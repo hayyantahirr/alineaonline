@@ -74,6 +74,8 @@ Unlike dynamic features (such as blog posts, teacher profiles, dynamic subject d
 
 ### 2.5 Director's Story / Founder Section
 - **File Location**: [`components/home/DirectorStory.jsx`](file:///d:/Coding%20Projects/Alinea/Alinea%20Online%20Frontend/alineaonline/components/home/DirectorStory.jsx)
+- **CTA Link**: `Meet our teaching faculty →` directing to `/faculty` to showcase the examiner-trained specialists under Khawar's direct oversight.
+
 
 ### 2.6 Subjects Spotlight Section
 - **File Location**: [`components/home/SubjectsSpotlight.jsx`](file:///d:/Coding%20Projects/Alinea/Alinea%20Online%20Frontend/alineaonline/components/home/SubjectsSpotlight.jsx)
