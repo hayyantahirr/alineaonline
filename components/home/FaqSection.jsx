@@ -21,6 +21,22 @@ export default function FaqSection() {
       q: "Typical results?",
       a: "Grade C → A* in two terms is typical for Alinea students, not the exception.",
     },
+    {
+      q: "How do online sessions actually work?",
+      a: "All sessions run live, 1:1, on Zoom — no recordings, no groups, just focused teaching time.",
+    },
+    {
+      q: "Is my child's safety protected during online lessons?",
+      a: "Every teacher is personally vetted by Khawar before joining Alinea — not hired through an open marketplace.",
+    },
+    {
+      q: "Can we try a session before committing?",
+      a: "Yes — start with a free intro call with Khawar to discuss your child's goals, no payment required.",
+    },
+    {
+      q: "What if we need to reschedule or my child misses a class?",
+      a: "Sessions can be rescheduled free of charge with advance notice, within a set window and for genuine reasons — not last-minute changes.",
+    },
   ];
 
   const [openIndex, setOpenIndex] = useState(null);

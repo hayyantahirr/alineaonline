@@ -147,3 +147,29 @@ Unlike dynamic features (such as blog posts, teacher profiles, dynamic subject d
 - **Working Hours**: `Mon–Sat, 10:00 AM – 9:00 PM GST`
 - **Official Email**: `info@alineaonline.com`
 - **Customer WhatsApp**: `+971 54 263 2026` (`https://wa.me/971542632026`)
+
+---
+
+## 7. Homepage FAQ & SEO Structured Data
+
+### 7.1 Component & Schema
+- **File Location**: [`components/home/FaqSection.jsx`](file:///d:/Coding%20Projects/Alinea/Alinea%20Online%20Frontend/alineaonline/components/home/FaqSection.jsx)
+- **JSON-LD Schema**: Embedded Schema.org `FAQPage` script containing all 8 Q&As for Google rich snippets.
+- **Questions (01–08)**:
+  1. `01` — **Why trust Alinea?**
+     > One academic director personally oversees every lesson — not a call center matching you to strangers.
+  2. `02` — **How are you different?**
+     > We teach the mark scheme, not just the syllabus — built from real examiner reports.
+  3. `03` — **Will my child improve?**
+     > Every lesson is measured against grade movement, not just effort or attendance.
+  4. `04` — **Typical results?**
+     > Grade C → A* in two terms is typical for Alinea students, not the exception.
+  5. `05` — **How do online sessions actually work?**
+     > All sessions run live, 1:1, on Zoom — no recordings, no groups, just focused teaching time.
+  6. `06` — **Is my child's safety protected during online lessons?**
+     > Every teacher is personally vetted by Khawar before joining Alinea — not hired through an open marketplace.
+  7. `07` — **Can we try a session before committing?**
+     > Yes — start with a free intro call with Khawar to discuss your child's goals, no payment required.
+  8. `08` — **What if we need to reschedule or my child misses a class?**
+     > Sessions can be rescheduled free of charge with advance notice, within a set window and for genuine reasons — not last-minute changes.
+
