@@ -20,8 +20,8 @@ Unlike dynamic features (such as blog posts, teacher profiles, dynamic subject d
 ### 1.2 Footer
 - **File Location**: [`components/Footer.jsx`](file:///d:/Coding%20Projects/Alinea/Alinea%20Online%20Frontend/alineaonline/components/Footer.jsx)
 - **Static Content**:
-  - **Brand Tagline**: *"We don't teach the syllabus. We teach the mark scheme. Specialising in IGCSE and A-Level preparations across the GCC and Asia."*
-  - **Curriculum Badges**: `IGCSE`, `A-LEVELS`, `IB DIPLOMA`.
+  - **Brand Tagline**: *"We don't teach the syllabus. We teach the mark scheme. Specialising in IGCSE, GCSE and A-Level preparations across the GCC and Asia."*
+  - **Curriculum Badges**: `IGCSE / GCSE`, `A-LEVELS`, `IB DIPLOMA`.
   - **Social Links & Handles**: Instagram URL (`https://www.instagram.com/alineaonline`), Customer WhatsApp link (`https://wa.me/971542632026`).
   - **Get In Touch Box**: Subtitle text and button label (`"WhatsApp Academic Team"` -> `+971 54 263 2026`).
   - **Bottom Bar**: Copyright statement, legal links (`Terms`, `Privacy Policy`), and developer credit link (`powered by hayyantahirr`).
@@ -36,8 +36,8 @@ Unlike dynamic features (such as blog posts, teacher profiles, dynamic subject d
 ### 1.4 Global Head & Metadata
 - **File Location**: [`app/layout.js`](file:///d:/Coding%20Projects/Alinea/Alinea%20Online%20Frontend/alineaonline/app/layout.js)
 - **Static Content**:
-  - **Page `<title>`**: `"Alinea Online | Premium IGCSE & A-Level Tutoring — GCC & Asia"`
-  - **Meta Description**: `"Small-group and 1:1 IGCSE, A-Level & IB tutoring in Economics, Business, Maths, Sciences & English. Mark-scheme-first teaching for students across the GCC and Asia."`
+  - **Page `<title>`**: `"Alinea Online | Premium IGCSE, GCSE & A-Level Tutoring — GCC & Asia"`
+  - **Meta Description**: `"Small-group and 1:1 IGCSE, GCSE, A-Level & IB tutoring in Economics, Business, Maths, Sciences & English. Mark-scheme-first teaching for students across the GCC and Asia."`
   - **Google Fonts Declarations**: `Archivo Black`, `Work Sans`, `IBM Plex Mono`.
 
 ---
@@ -49,7 +49,7 @@ Unlike dynamic features (such as blog posts, teacher profiles, dynamic subject d
 - **Static Content**:
   - **Top Pill Badge**: `"PREMIUM ONLINE ACADEMY"`.
   - **Main Headline**: *"We don't teach the syllabus. We teach the mark scheme."* (with red stroke underline SVG).
-  - **Subtitle Paragraph**: *"A small, highly focused online academy with stringent academic oversight. Specialising in IGCSE and A-Level preparations..."*
+  - **Subtitle Paragraph**: *"A small, highly focused online academy with stringent academic oversight. Specialising in IGCSE, GCSE and A-Level preparations..."*
   - **CTA Buttons**: `"Book a Session"` and `"View Subjects"`.
 
 ### 2.2 Interactive Graded Script Graphic

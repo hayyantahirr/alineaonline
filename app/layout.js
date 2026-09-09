@@ -26,9 +26,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata = {
-  title: "Alinea Online | Premium IGCSE & A-Level Tutoring — GCC & Asia",
+  title: "Alinea Online | Premium IGCSE, GCSE & A-Level Tutoring — GCC & Asia",
   description:
-    "Small-group and 1:1 IGCSE, A-Level & IB tutoring in Economics, Business, Maths, Sciences & English. Mark-scheme-first teaching for students across the GCC and Asia.",
+    "Small-group and 1:1 IGCSE, GCSE, A-Level & IB tutoring in Economics, Business, Maths, Sciences & English. Mark-scheme-first teaching for students across the GCC and Asia.",
 };
 
 export default function RootLayout({ children }) {

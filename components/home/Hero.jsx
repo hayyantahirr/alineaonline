@@ -30,7 +30,7 @@ export default function Hero() {
             </span>
           </h1>
           <p className="font-['Work_Sans'] text-base md:text-lg text-on-surface-variant max-w-xl leading-relaxed">
-            A small, highly focused online academy with stringent academic oversight. Specialising in IGCSE and A-Level preparations for students across the GCC and Asia.
+            A small, highly focused online academy with stringent academic oversight. Specialising in IGCSE, GCSE and A-Level preparations for students across the GCC and Asia.
           </p>
           <div className="flex flex-wrap gap-4 pt-2">
             <Link
@@ -48,7 +48,11 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="md:col-span-5 relative">
+        <div
+          className="md:col-span-5 relative"
+          role="img"
+          aria-label="Alinea Online examiner-graded exam script — IGCSE GCSE A-Level tutoring with marked rubric and A* score"
+        >
           <GradedScript />
         </div>
       </div>

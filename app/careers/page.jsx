@@ -731,7 +731,6 @@ export default function CareersPage() {
                     <datalist id="careers-subjects-suggestions">
                       <option value="Economics" />
                       <option value="Mathematics" />
-                      <option value="Further Mathematics" />
                       <option value="Physics" />
                       <option value="Biology" />
                       <option value="Chemistry" />

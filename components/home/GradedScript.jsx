@@ -152,7 +152,15 @@ export default function GradedScript() {
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full max-w-97.5 mx-auto">
+    <div
+      ref={containerRef}
+      className="w-full max-w-97.5 mx-auto"
+      role="img"
+      aria-label="Alinea Online examiner-graded student answer script with mark-scheme annotations — IGCSE GCSE A-Level tutoring"
+    >
+      <span className="sr-only">
+        Alinea Online examiner-graded student answer script with mark-scheme annotations and A* grade stamp — IGCSE GCSE A-Level tutoring
+      </span>
       {/* Paper Card with Increased Height */}
       <div className="script-paper rounded-2xl border-2 border-on-background shadow-[10px_10px_0_0_var(--color-on-background)] bg-[#faf8f2] relative overflow-hidden p-6 pb-8 md:p-8 md:pb-10 min-h-117.5 sm:min-h-127.5 flex flex-col justify-between">
         {/* Ruled-line texture */}

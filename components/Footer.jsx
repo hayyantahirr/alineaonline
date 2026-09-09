@@ -17,12 +17,12 @@ export default function Footer() {
             </Link>
             <p className="text-surface-variant max-w-sm text-sm leading-relaxed">
               We don&apos;t teach the syllabus. We teach the mark scheme.
-              Specialising in IGCSE and A-Level preparations for high-stakes
+              Specialising in IGCSE, GCSE and A-Level preparations for high-stakes
               exam excellence across the GCC and Asia.
             </p>
             <div className="flex flex-wrap gap-2.5 pt-1 font-['IBM_Plex_Mono'] text-xs text-primary-fixed uppercase tracking-wider">
               <span className="px-3.5 py-1.5 bg-white/5 rounded-full border border-white/15 hover:border-primary-container/50 hover:bg-primary-container/10 transition-all duration-200 cursor-default">
-                IGCSE
+                IGCSE / GCSE
               </span>
               <span className="px-3.5 py-1.5 bg-white/5 rounded-full border border-white/15 hover:border-primary-container/50 hover:bg-primary-container/10 transition-all duration-200 cursor-default">
                 A-LEVELS

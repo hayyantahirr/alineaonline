@@ -10,7 +10,7 @@ export default function DirectorStory() {
             <img
               src="/stitch/founder.jpg"
               className="w-full h-full object-cover"
-              alt="Khawar, Academic Director"
+              alt="Khawar, Academic Director at Alinea Online — IGCSE GCSE A-Level tutoring specialist"
             />
             <div className="absolute inset-0 bg-linear-to-t from-on-background/60 to-transparent"></div>
           </div>
