@@ -29,11 +29,29 @@ export default function FaqSection() {
     setOpenIndex(openIndex === idx ? null : idx);
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <section
       id="faq"
       className="w-full bg-surface-container-low py-20 md:py-28"
     >
+      {/* FAQPage JSON-LD Structured Data for Google Rich Snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="px-6 max-w-container-max mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16">
           {/* Left Column — Title */}

@@ -80,6 +80,7 @@ Unlike dynamic features (such as blog posts, teacher profiles, dynamic subject d
 
 ### 2.7 FAQ Section & Bottom CTA Banner
 - **File Locations**: [`components/home/FaqSection.jsx`](file:///d:/Coding%20Projects/Alinea/Alinea%20Online%20Frontend/alineaonline/components/home/FaqSection.jsx), [`components/home/CtaBanner.jsx`](file:///d:/Coding%20Projects/Alinea/Alinea%20Online%20Frontend/alineaonline/components/home/CtaBanner.jsx)
+- **Structured Data**: Includes dynamic Schema.org `FAQPage` JSON-LD structured data for Google FAQ rich snippet eligibility.
 - Customer WhatsApp link: `https://wa.me/971542632026`.
 
 ---
